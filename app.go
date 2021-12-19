@@ -69,7 +69,7 @@ type TWLanuncherInfo struct {
 // GetInfo : プログラムをWindowから終了させる
 func (b *App) GetInfo() TWLanuncherInfo {
 	return TWLanuncherInfo{
-		Version: "v1.7.0",
+		Version: fmt.Sprintf("%s(%s)", version, commit),
 		Env:     runtime.GOOS,
 	}
 }

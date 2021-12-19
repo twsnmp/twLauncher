@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"log"
 
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
@@ -17,6 +18,9 @@ var assets embed.FS
 
 //go:embed build/appicon.png
 var icon []byte
+
+var version = "v0.0.0"
+var commit = ""
 
 func main() {
 	// Create an instance of the app structure
@@ -57,7 +61,7 @@ func main() {
 				HideTitle:                  true,
 				HideTitleBar:               true,
 				FullSizeContent:            true,
-				UseToolbar:                 true,
+				UseToolbar:                 false,
 				HideToolbarSeparator:       true,
 			},
 			Appearance:           mac.NSAppearanceNameDarkAqua,
@@ -65,7 +69,7 @@ func main() {
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{
 				Title:   "TWSNMP起動/設定ツール",
-				Message: "© 2021 Masayuki Yamai",
+				Message: fmt.Sprintf("twLauncher %s(%s) © 2021 Masayuki Yamai", version, commit),
 				Icon:    icon,
 			},
 		},
