@@ -6,19 +6,19 @@
 <fieldset>
   <div class="field-row">TWWinLog:{ status }</div>
   <div class="field-row">
-    <label for="twWinLog_syslog">syslog送信先:</label>
-    <input id="twWinLog_syslog" type="text" style="width: 80%;" />
+    <label for="syslog">syslog送信先:</label>
+    <input id="syslog" type="text" style="width: 80%;" />
   </div>
   <div class="field-row">
-    <label for="twWinLog_remote">リモート:</label>
-    <input id="twWinLog_remote" type="text"/>
-    <label for="twWinLog_user">ユーザー:</label>
-    <input id="twWinLog_user" type="text"/>
-    <label for="twWinLog_password">パスワード:</label>
-    <input id="twWinLog_password" type="password"/>
-    <label for="twWinLog_interval">送信間隔:</label>
-    <input id="twWinLog_interval" type="number" min="60" max="3600" value="600" />
-    <label for="twWinLog_interval">秒</label>
+    <label for="remote">リモート:</label>
+    <input id="remote" type="text"/>
+    <label for="user">ユーザー:</label>
+    <input id="user" type="text"/>
+    <label for="password">パスワード:</label>
+    <input id="password" type="password"/>
+    <label for="interval">送信間隔:</label>
+    <input id="interval" type="number" min="60" max="3600" value="600" />
+    <label for="interval">秒</label>
   </div>
   <div class="field-row">
     <button>起動</button>
