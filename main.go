@@ -24,7 +24,7 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:             "twLauncher",
+		Title:             "TWSNMP起動/設定ツール",
 		Width:             720,
 		Height:            570,
 		MinWidth:          720,
@@ -52,13 +52,20 @@ func main() {
 			DisableWindowIcon:    false,
 		},
 		Mac: &mac.Options{
-			TitleBar:             mac.TitleBarHiddenInset(),
+			TitleBar: &mac.TitleBar{
+				TitlebarAppearsTransparent: true,
+				HideTitle:                  true,
+				HideTitleBar:               true,
+				FullSizeContent:            true,
+				UseToolbar:                 true,
+				HideToolbarSeparator:       true,
+			},
 			Appearance:           mac.NSAppearanceNameDarkAqua,
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{
-				Title:   "My Application",
-				Message: "© 2021 Me",
+				Title:   "TWSNMP起動/設定ツール",
+				Message: "© 2021 Masayuki Yamai",
 				Icon:    icon,
 			},
 		},

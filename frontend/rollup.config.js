@@ -5,6 +5,7 @@ import livereload from 'rollup-plugin-livereload';
 import {terser} from 'rollup-plugin-terser';
 import copy from 'rollup-plugin-copy';
 import postcss from 'rollup-plugin-postcss'
+import css from "rollup-plugin-css-only";
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -38,6 +39,7 @@ export default {
 		file: 'dist/bundle.js'
 	},
 	plugins: [
+    css({ output: "twlauncher.css" }),
 		svelte({
 			compilerOptions: {
 				// enable run-time checks when not in production
