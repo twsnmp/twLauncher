@@ -5,11 +5,11 @@
 	"info": {
 		"0000": {
 			"ProductVersion": "1.0.0",
-			"CompanyName": "twLauncher",
+			"CompanyName": "TWISE Labo Inc.",
 			"FileDescription": "twLauncher",
-			"LegalCopyright": "Copyright.........",
+			"LegalCopyright": "Copyright 2021 Masayuki Yamai",
 			"ProductName": "twLauncher",
-			"Comments": "Built using Wails (https://wails.app)"
+			"Comments": "TWSNMP Launcher"
 		}
 	}
 }

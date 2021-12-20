@@ -1,6 +1,6 @@
 <script>
 	import "../node_modules/98.css/dist/98.css"
-	import TWSNMPFC from "./TWSNMPFC.svelte"
+	import TWSNMP from "./TWSNMP.svelte"
 	import TWPCAP from "./TWPCAP.svelte"
 	import TWWifiScan from "./TWWifiScan.svelte"
 	import TWWinLog from "./TWWinLog.svelte"
@@ -21,15 +21,17 @@
 
 <main>
 	<div class="window">
+	{#if info.Env == 'darwin'}
 		<div class="title-bar">
-			<div class="title-bar-text">TWSNMP管理ツール</div>
+			<div class="title-bar-text">TWSNMP起動/設定ツール</div>
 			<div class="title-bar-controls">
 				<button aria-label="Minimize" on:click={minWindow} />
 				<button aria-label="Close" on:click={closeWindow} />
 			</div>
 		</div>
+	{/if}
 		<div class="window-body" data-wails-no-drag>
-			<TWSNMPFC/>
+			<TWSNMP/>
 			<TWPCAP />
 			<TWWifiScan />
 			{#if info.Env === 'windows'}

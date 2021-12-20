@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"runtime"
 	"time"
 
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -70,6 +69,45 @@ type TWLanuncherInfo struct {
 func (b *App) GetInfo() TWLanuncherInfo {
 	return TWLanuncherInfo{
 		Version: fmt.Sprintf("%s(%s)", version, commit),
-		Env:     runtime.GOOS,
+		// Env:     runtime.GOOS,
+		Env: "windows",
+	}
+}
+
+type TWSNMPInfo struct {
+	DataStore string
+	Password  string
+	Status    string
+	Task      string
+}
+
+// GetTWSNMP : TWSNMPの情報を取得する
+func (b *App) GetTWSNMP() TWSNMPInfo {
+	wails.LogDebug(b.ctx, "GetTWSNMP")
+	return TWSNMPInfo{
+		DataStore: "",
+		Password:  "",
+		Status:    "稼働中",
+		Task:      "No",
+	}
+}
+
+type TWWinLogInfo struct {
+	Syslog   string
+	Interval int
+	Remote   string
+	User     string
+	Password string
+	Status   string
+	Task     string
+}
+
+// GetTWWinLog : TWWinLogの情報を取得する
+func (b *App) GetTWWinLog() TWWinLogInfo {
+	wails.LogDebug(b.ctx, "GetTWSNMP")
+	return TWWinLogInfo{
+		Password: "",
+		Status:   "稼働中",
+		Task:     "No",
 	}
 }

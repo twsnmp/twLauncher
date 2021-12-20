@@ -5,11 +5,28 @@ const go = {
   "main": {
     "App": {
       /**
+       * AddTask
+       * @param {string} arg1 - Go Type: string
+       * @param {string} arg2 - Go Type: string
+       * @returns {Promise<string>}  - Go Type: string
+       */
+      "AddTask": (arg1, arg2) => {
+        return window.go.main.App.AddTask(arg1, arg2);
+      },
+      /**
        * Close
        * @returns {Promise<string>}  - Go Type: string
        */
       "Close": () => {
         return window.go.main.App.Close();
+      },
+      /**
+       * DelTask
+       * @param {string} arg1 - Go Type: string
+       * @returns {Promise<string>}  - Go Type: string
+       */
+      "DelTask": (arg1) => {
+        return window.go.main.App.DelTask(arg1);
       },
       /**
        * GetDataStore
@@ -24,6 +41,37 @@ const go = {
        */
       "GetInfo": () => {
         return window.go.main.App.GetInfo();
+      },
+      /**
+       * GetTWSNMP
+       * @returns {Promise<TWSNMPInfo>}  - Go Type: main.TWSNMPInfo
+       */
+      "GetTWSNMP": () => {
+        return window.go.main.App.GetTWSNMP();
+      },
+      /**
+       * GetTWWinLog
+       * @returns {Promise<TWWinLogInfo>}  - Go Type: main.TWWinLogInfo
+       */
+      "GetTWWinLog": () => {
+        return window.go.main.App.GetTWWinLog();
+      },
+      /**
+       * Start
+       * @param {string} arg1 - Go Type: string
+       * @param {string} arg2 - Go Type: string
+       * @returns {Promise<string>}  - Go Type: string
+       */
+      "Start": (arg1, arg2) => {
+        return window.go.main.App.Start(arg1, arg2);
+      },
+      /**
+       * Stop
+       * @param {string} arg1 - Go Type: string
+       * @returns {Promise<string>}  - Go Type: string
+       */
+      "Stop": (arg1) => {
+        return window.go.main.App.Stop(arg1);
       },
     },
   },
