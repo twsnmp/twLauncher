@@ -43,11 +43,25 @@ const go = {
         return window.go.main.App.GetInfo();
       },
       /**
+       * GetTWPCAP
+       * @returns {Promise<TWPCAPInfo>}  - Go Type: main.TWPCAPInfo
+       */
+      "GetTWPCAP": () => {
+        return window.go.main.App.GetTWPCAP();
+      },
+      /**
        * GetTWSNMP
        * @returns {Promise<TWSNMPInfo>}  - Go Type: main.TWSNMPInfo
        */
       "GetTWSNMP": () => {
         return window.go.main.App.GetTWSNMP();
+      },
+      /**
+       * GetTWWifiScan
+       * @returns {Promise<TWWifiScanInfo>}  - Go Type: main.TWWifiScanInfo
+       */
+      "GetTWWifiScan": () => {
+        return window.go.main.App.GetTWWifiScan();
       },
       /**
        * GetTWWinLog

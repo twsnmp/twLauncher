@@ -21,7 +21,7 @@
 		})
 	}
   const start = () => {
-		window.go.main.App.Start('TWSNMP','').then((r) => {
+		window.go.main.App.Start('twsnmpfc','').then((r) => {
       if (r === '') {
         info.Status = '稼働中'
       } else {
@@ -31,7 +31,7 @@
     })
   }
   const stop = () => {
-		window.go.main.App.Stop('TWSNMP').then((r) => {
+		window.go.main.App.Stop('twsnmpfc').then((r) => {
       if (r === '') {
         info.Status = '停止'
       } else {
@@ -41,7 +41,7 @@
     })
   }
   const addTask = () => {
-    window.go.main.App.AddTask('TWSNMP','').then((r) => {
+    window.go.main.App.AddTask('twsnmpfc','').then((r) => {
       if (r==='') {
         info.Task = 'Yes'
       } else {
@@ -51,7 +51,7 @@
     })
   }
   const delTask = () => {
-    window.go.main.App.DelTask('TWSNMP').then((r) => {
+    window.go.main.App.DelTask('twsnmpfc').then((r) => {
       if (r==='') {
         info.Task = 'No'
       } else {

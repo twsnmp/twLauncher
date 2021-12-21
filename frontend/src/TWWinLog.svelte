@@ -1,5 +1,6 @@
 <script>
 	import "../node_modules/98.css/dist/98.css";
+  import Alert from "./Alert.svelte"
   let info = {
     Syslog: '',
     Interval: 600,
@@ -57,6 +58,7 @@
   }
 </script>
 
+<Alert prop={alert} />
 <fieldset>
   <div class="field-row">TWWinLog:{ info.Status }</div>
   <div class="field-row">

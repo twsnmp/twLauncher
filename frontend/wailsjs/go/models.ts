@@ -14,11 +14,35 @@ export class TWLanuncherInfo {
 
     }
 }
+export class TWPCAPInfo {
+
+
+    static createFrom(source: any = {}) {
+        return new TWPCAPInfo(source);
+    }
+
+    constructor(source: any = {}) {
+        if ('string' === typeof source) source = JSON.parse(source);
+
+    }
+}
 export class TWSNMPInfo {
 
 
     static createFrom(source: any = {}) {
         return new TWSNMPInfo(source);
+    }
+
+    constructor(source: any = {}) {
+        if ('string' === typeof source) source = JSON.parse(source);
+
+    }
+}
+export class TWWifiScanInfo {
+
+
+    static createFrom(source: any = {}) {
+        return new TWWifiScanInfo(source);
     }
 
     constructor(source: any = {}) {
