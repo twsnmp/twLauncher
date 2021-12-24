@@ -37,47 +37,28 @@ const go = {
       },
       /**
        * GetInfo
-       * @returns {Promise<TWLanuncherInfo>}  - Go Type: main.TWLanuncherInfo
+       * @returns {Promise<LanuncherInfo>}  - Go Type: main.LanuncherInfo
        */
       "GetInfo": () => {
         return window.go.main.App.GetInfo();
       },
       /**
-       * GetTWPCAP
-       * @returns {Promise<TWPCAPInfo>}  - Go Type: main.TWPCAPInfo
+       * GetProcessInfo
+       * @param {string} arg1 - Go Type: string
+       * @returns {Promise<ProcessInfo>}  - Go Type: main.ProcessInfo
        */
-      "GetTWPCAP": () => {
-        return window.go.main.App.GetTWPCAP();
-      },
-      /**
-       * GetTWSNMP
-       * @returns {Promise<TWSNMPInfo>}  - Go Type: main.TWSNMPInfo
-       */
-      "GetTWSNMP": () => {
-        return window.go.main.App.GetTWSNMP();
-      },
-      /**
-       * GetTWWifiScan
-       * @returns {Promise<TWWifiScanInfo>}  - Go Type: main.TWWifiScanInfo
-       */
-      "GetTWWifiScan": () => {
-        return window.go.main.App.GetTWWifiScan();
-      },
-      /**
-       * GetTWWinLog
-       * @returns {Promise<TWWinLogInfo>}  - Go Type: main.TWWinLogInfo
-       */
-      "GetTWWinLog": () => {
-        return window.go.main.App.GetTWWinLog();
+      "GetProcessInfo": (arg1) => {
+        return window.go.main.App.GetProcessInfo(arg1);
       },
       /**
        * Start
        * @param {string} arg1 - Go Type: string
-       * @param {string} arg2 - Go Type: string
+       * @param {Array<string>} arg2 - Go Type: []string
+       * @param {boolean} arg3 - Go Type: bool
        * @returns {Promise<string>}  - Go Type: string
        */
-      "Start": (arg1, arg2) => {
-        return window.go.main.App.Start(arg1, arg2);
+      "Start": (arg1, arg2, arg3) => {
+        return window.go.main.App.Start(arg1, arg2, arg3);
       },
       /**
        * Stop

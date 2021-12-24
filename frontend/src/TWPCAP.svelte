@@ -1,106 +1,178 @@
 <script>
-	import "../node_modules/98.css/dist/98.css";
-  import Alert from "./Alert.svelte"
+  import { afterUpdate } from "svelte";
+  import "../node_modules/98.css/dist/98.css";
+  import Alert from "./Alert.svelte";
+  export let env = "";
+  export let ifaces = [];
   let info = {
-    Syslog: '',
+    Params: [],
+    Running: false,
+    Task: false,
+  };
+  let conf = {
+    Syslog: "",
     Interval: 600,
     Retention: 3600,
-    Status: '',
-    Iface: '',
-    Ifaces: [],
-  }
+    Iface: "",
+  };
   let alert = {
-    title: '',
-    message: '',
-  }
-  window.go.main.App.GetTWPCAP().then((r) => {
-		info = r
-	})
+    title: "",
+    message: "",
+  };
+  window.go.main.App.GetProcessInfo("twpcap").then((r) => {
+    info = r;
+    setConf(info.Params);
+  });
+  afterUpdate(() => {
+    if (!conf.Iface) {
+      conf.Iface = ifaces && ifaces.length > 0 ? ifaces[0].Value : "";
+    }
+	});
   const start = () => {
-		window.go.main.App.Start('twpcap','').then((r) => {
-			if (r === '') {
-        info.Status = '稼働中'
+    if (!checkParams()) {
+      return;
+    }
+    let params = [];
+    params.push("-syslog");
+    params.push(conf.Syslog);
+    params.push("-iface");
+    params.push(conf.Iface);
+    params.push("-interval");
+    params.push(conf.Interval + "");
+    params.push("-retention");
+    params.push(conf.Retention + "");
+    setAlert("TWPCAP起動中", "TWPCAPを起動しています。お待ちください。", true);
+    window.go.main.App.Start("twpcap", params,conf.Task).then((r) => {
+      if (r === "") {
+        info.Running = true;
       } else {
-        alert.title = 'TWWinLog起動失敗'
-        alert.message = r
+        setAlert("TWPCAP起動エラー", r, false);
       }
-		})
-  }
+    });
+  };
   const stop = () => {
-		window.go.main.App.Stop('twpcap').then((r) => {
-			if (r === '') {
-        info.Status = '停止'
+    setAlert("TWPCAP停止中", "TWPCAPを起動しています。お待ちください。", true);
+    window.go.main.App.Stop("twpcap").then((r) => {
+      if (r === "") {
+        info.Running = false;
       } else {
-        alert.title = 'TWPCAP停止失敗'
-        alert.message = r
+        setAlert("TWPCAP停止エラー", r, false);
       }
-		})
-  }
-  const addTask = () => {
-		window.go.main.App.AddTask('twpcap','').then((r) => {
-			if (r === '') {
-        info.Task = 'Yes'
-      } else {
-        alert.title = 'TWPCAPタスク登録失敗'
-        alert.message = r
+    });
+  };
+  const setAlert = (t, m, w) => {
+    alert.title = t;
+    alert.message = m;
+    alert.wait = w;
+  };
+  const checkParams = () => {
+    if (!conf.Syslog) {
+      setAlert(
+        "TWPCAPパラメータエラー",
+        "Syslogの送信先を指定してください。",
+        false
+      );
+      return false;
+    }
+    if (!conf.Iface) {
+      setAlert("TWPCAPパラメータエラー", "LAN I/Fを指定してください。", false);
+      return false;
+    }
+    return true;
+  };
+  const setConf = (params) => {
+    window.runtime.LogDebug("test1")
+    for (let i = 0; i < params.length; i++) {
+      switch (params[i]) {
+        case "-syslog":
+          if (i < params.length - 1) {
+            conf.Syslog = params[i + 1];
+            i++;
+          }
+          break;
+        case "-iface":
+          if (i < params.length - 1) {
+            conf.Iface = params[i + 1];
+            i++;
+          }
+          break;
+        case "-interval":
+          if (i < params.length - 1) {
+            conf.Interval = params[i + 1] * 1;
+            i++;
+          }
+          break;
+        case "-retention":
+          if (i < params.length - 1) {
+            conf.Retention = params[i + 1] * 1;
+            i++;
+          }
+          break;
       }
-		})
-  }
-  const delTask = () => {
-		window.go.main.App.DelTask('twpcap').then((r) => {
-			if (r === '') {
-        info.Task = 'No'
-      } else {
-        alert.title = 'TWPCAPタスク登録解除失敗'
-        alert.message = r
-      }
-		})
-  }
+    }
+    if (conf.Interval < 60) {
+      conf.Interval = 600;
+    }
+    if (conf.Retention < 600) {
+      conf.Retention = 3600;
+    }
+    conf.Task = info.Task;
+  };
 </script>
 
 <Alert prop={alert} />
 <fieldset>
-  <div class="field-row">TWPCAP:{ info.Status }</div>
+  <div class="field-row">TWPCAP:{info.Running ? "稼働" : "停止"}</div>
   <div class="field-row">
     <label for="syslog">syslog送信先:</label>
-    <input id="syslog" type="text" style="width: 80%;" bind:value={info.Syslog} />
+    <input
+      id="syslog"
+      type="text"
+      style="width: 80%;"
+      bind:value={conf.Syslog}
+    />
   </div>
   <div class="field-row">
     <label for="iface">LAN I/F:</label>
-    <select id="iface" bind:value={info.Iface}>
-      {#each info.Ifaces as i}
-        <option value={i.Value }>{i.Text}</option>
+    <select id="iface" bind:value={conf.Iface}>
+      {#each ifaces as i}
+        <option value={i.Value}>{i.Text}</option>
       {/each}
     </select>
   </div>
   <div class="field-row">
     <label for="interval">送信間隔:</label>
-    <input id="interval" type="number" min="60" max="3600" bind:value={info.Interval} />
+    <input
+      id="interval"
+      type="number"
+      min="60"
+      max="3600"
+      bind:value={conf.Interval}
+    />
     <label for="interval">秒</label>
     <label for="retention">保存時間:</label>
-    <input id="retention" type="number" min="600" bind:value={info.Retention} />
+    <input id="retention" type="number" min="600" bind:value={conf.Retention} />
     <label for="retention">秒</label>
+    {#if env == "windows"}
+      <input type="checkbox" id="twpcap_task" bind:checked={conf.Task} />
+      <label for="twpcap_task">スケジューラー</label>
+    {/if}
   </div>
   <div class="field-row">
-    {#if info.Status === '稼働中'}
+    {#if info.Running}
       <button on:click={stop}>停止</button>
     {:else}
       <button on:click={start}>起動</button>
-    {/if}
-    {#if info.Task == 'No' }
-      <button on:click={addTask}>タスク登録</button>
-    {:else if info.Task == 'Yes' }
-      <button on:click={delTask}>タスク登録解除</button>
     {/if}
   </div>
 </fieldset>
 
 <style>
-	label {
-		width:  80px;
-		margin-left: 10px;
-	}
-	input[type="number"] {
-		width: 50px;
-	}
+  label {
+    width: 80px;
+    margin-left: 10px;
+  }
+  input[type="number"] {
+    width: 50px;
+  }
 </style>

@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/google/gopacket v1.1.19
+	github.com/mitchellh/go-ps v1.0.0
 	github.com/wailsapp/wails/v2 v2.0.0-beta.23
 )
 

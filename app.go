@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/google/gopacket/pcap"
@@ -13,12 +12,16 @@ import (
 
 // App application struct
 type App struct {
-	ctx context.Context
+	ctx        context.Context
+	processMap map[string][]string
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	return &App{}
+	pmap := make(map[string][]string)
+	return &App{
+		processMap: pmap,
+	}
 }
 
 // startup is called at application startup
@@ -62,106 +65,26 @@ func (b *App) GetDataStore() string {
 	return dir
 }
 
+// selectDataEnt : 選択データー
 type selectDataEnt struct {
 	Text  string
 	Value string
 }
 
-type TWLanuncherInfo struct {
+// LanuncherInfo : ランチャーの情報
+type LanuncherInfo struct {
 	Version string
 	Env     string
+	Ifaces  []selectDataEnt
 }
 
-// GetInfo : プログラムをWindowから終了させる
-func (b *App) GetInfo() TWLanuncherInfo {
-	return TWLanuncherInfo{
+// GetInfo : ランチャー情報の取得
+func (b *App) GetInfo() LanuncherInfo {
+	return LanuncherInfo{
 		Version: fmt.Sprintf("%s(%s)", version, commit),
-		Env:     runtime.GOOS,
-	}
-}
-
-// TWSNMPInfo : TWSNMP FCの情報
-type TWSNMPInfo struct {
-	DataStore string
-	Password  string
-	Local     bool
-	Status    string
-	Task      string
-}
-
-// GetTWSNMP : TWSNMPの情報を取得する
-func (b *App) GetTWSNMP() TWSNMPInfo {
-	wails.LogDebug(b.ctx, "GetTWSNMP")
-	return TWSNMPInfo{
-		DataStore: "",
-		Password:  "",
-		Status:    "稼働中",
-		Task:      "No",
-	}
-}
-
-// TWWinLogInfo : twWinLogセンサーの情報
-type TWWinLogInfo struct {
-	Syslog   string
-	Interval int
-	Remote   string
-	User     string
-	Password string
-	Status   string
-	Task     string
-}
-
-// GetTWWinLog : TWWinLogの情報を取得する
-func (b *App) GetTWWinLog() TWWinLogInfo {
-	wails.LogDebug(b.ctx, "GetTWSNMP")
-	return TWWinLogInfo{
-		Interval: 300,
-		Password: "",
-		Status:   "稼働中",
-		Task:     "No",
-	}
-}
-
-// TWPCAPInfo : TWPCAPセンサーの情報
-type TWPCAPInfo struct {
-	Syslog    string
-	Interval  int
-	Retention int
-	Iface     string
-	Ifaces    []selectDataEnt
-	Status    string
-	Task      string
-}
-
-// GetTWPCAP : TWPCAPの情報を取得する
-func (b *App) GetTWPCAP() TWPCAPInfo {
-	wails.LogDebug(b.ctx, "GetTWPCAP")
-	return TWPCAPInfo{
-		Interval: 300,
-		Ifaces:   b.getIfaces(),
-		Status:   "稼働中",
-		Task:     "No",
-	}
-}
-
-// TWWifiScanInfo : TWWifiScanセンサーの情報
-type TWWifiScanInfo struct {
-	Syslog   string
-	Interval int
-	Iface    string
-	Ifaces   []selectDataEnt
-	Status   string
-	Task     string
-}
-
-// GetTWWifiScan : TWWifiScanの情報を取得する
-func (b *App) GetTWWifiScan() TWWifiScanInfo {
-	wails.LogDebug(b.ctx, "GetTWWifiScan")
-	return TWWifiScanInfo{
-		Interval: 300,
-		Ifaces:   b.getIfaces(),
-		Status:   "稼働中",
-		Task:     "No",
+		// Env:     runtime.GOOS,
+		Env:    "windows",
+		Ifaces: b.getIfaces(),
 	}
 }
 
@@ -186,7 +109,7 @@ func (b *App) getIfaces() []selectDataEnt {
 	return ret
 }
 
-// getIPv4 : LAN I/FのリストからIPｖ４アドレスを取得する
+// getIPv4 : LAN I/FのリストからIPv4アドレスを取得する
 func getIPv4(addrs []pcap.InterfaceAddress) string {
 	r := ""
 	for _, ip := range addrs {

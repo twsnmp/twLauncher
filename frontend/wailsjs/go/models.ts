@@ -2,11 +2,11 @@
 
 export {};
 
-export class TWLanuncherInfo {
+export class LanuncherInfo {
 
 
     static createFrom(source: any = {}) {
-        return new TWLanuncherInfo(source);
+        return new LanuncherInfo(source);
     }
 
     constructor(source: any = {}) {
@@ -14,47 +14,11 @@ export class TWLanuncherInfo {
 
     }
 }
-export class TWPCAPInfo {
+export class ProcessInfo {
 
 
     static createFrom(source: any = {}) {
-        return new TWPCAPInfo(source);
-    }
-
-    constructor(source: any = {}) {
-        if ('string' === typeof source) source = JSON.parse(source);
-
-    }
-}
-export class TWSNMPInfo {
-
-
-    static createFrom(source: any = {}) {
-        return new TWSNMPInfo(source);
-    }
-
-    constructor(source: any = {}) {
-        if ('string' === typeof source) source = JSON.parse(source);
-
-    }
-}
-export class TWWifiScanInfo {
-
-
-    static createFrom(source: any = {}) {
-        return new TWWifiScanInfo(source);
-    }
-
-    constructor(source: any = {}) {
-        if ('string' === typeof source) source = JSON.parse(source);
-
-    }
-}
-export class TWWinLogInfo {
-
-
-    static createFrom(source: any = {}) {
-        return new TWWinLogInfo(source);
+        return new ProcessInfo(source);
     }
 
     constructor(source: any = {}) {

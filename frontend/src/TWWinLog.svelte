@@ -1,107 +1,170 @@
 <script>
-	import "../node_modules/98.css/dist/98.css";
-  import Alert from "./Alert.svelte"
+  import "../node_modules/98.css/dist/98.css";
+  import Alert from "./Alert.svelte";
   let info = {
-    Syslog: '',
+    Params: [],
+    Running: false,
+    Task: false,
+  };
+  let conf = {
+    Syslog: "",
     Interval: 600,
     Remote: '',
     User: '',
     Password: '',
-    Status: '',
-  }
+  };
   let alert = {
-    title: '',
-    message: '',
-  }
-  window.go.main.App.GetTWWinLog().then((r) => {
-		info = r
-	})
+    title: "",
+    message: "",
+  };
+  window.go.main.App.GetProcessInfo("twWinLog").then((r) => {
+    info = r;
+    setConf(r.Params);
+  });
   const start = () => {
-		window.go.main.App.Start('twWinLog','').then((r) => {
-			if (r === '') {
-        info.Status = '稼働中'
+    if (!checkParams()) {
+      return;
+    }
+    let params = [];
+    params.push("-syslog");
+    params.push(conf.Syslog);
+    params.push("-iface");
+    params.push(conf.Iface);
+    params.push("-interval");
+    params.push(conf.Interval + "");
+    if( conf.Remote) {
+      params.push("-remote");
+      params.push(conf.Remote);
+      params.push("-user");
+      params.push(conf.User);
+      params.push("-password");
+      params.push(conf.Passowd);
+    }
+    setAlert("twWinLog起動中", "twWinLogを起動しています。お待ちください。", true);
+    window.go.main.App.Start("twWinLog", params,conf.Task).then((r) => {
+      if (r === "") {
+        info.Running = true;
       } else {
-        alert.title = 'TWWinLog起動失敗'
-        alert.message = r
+        setAlert("twWinLog起動エラー", r, false);
       }
-		})
-  }
+    });
+  };
   const stop = () => {
-		window.go.main.App.Stop('twWinLog').then((r) => {
-			if (r === '') {
-        info.Status = '停止'
+    setAlert("twWinLog停止中", "twWinLogを起動しています。お待ちください。", true);
+    window.go.main.App.Stop("twWinLog").then((r) => {
+      if (r === "") {
+        info.Running = false;
       } else {
-        alert.title = 'TWWinLog停止失敗'
-        alert.message = r
+        setAlert("twWinLog停止エラー", r, false);
       }
-		})
-  }
-  const addTask = () => {
-		window.go.main.App.AddTask('twWinLog','').then((r) => {
-			if (r === '') {
-        info.Task = 'Yes'
-      } else {
-        alert.title = 'TWWinLogタスク登録失敗'
-        alert.message = r
+    });
+  };
+  const setAlert = (t, m, w) => {
+    alert.title = t;
+    alert.message = m;
+    alert.wait = w;
+  };
+  const checkParams = () => {
+    if (!conf.Syslog) {
+      setAlert(
+        "twWinLogパラメータエラー",
+        "Syslogの送信先を指定してください。",
+        false
+      );
+      return false;
+    }
+    return true;
+  };
+  const setConf = (params) => {
+    for (let i = 0; i < params.length; i++) {
+      switch (params[i]) {
+        case "-syslog":
+          if (i < params.length - 1) {
+            conf.Syslog = params[i + 1];
+            i++;
+          }
+          break;
+        case "-interval":
+          if (i < params.length - 1) {
+            conf.Interval = params[i + 1] * 1;
+            i++;
+          }
+          break;
+        case "-remote":
+          if (i < params.length - 1) {
+            conf.Remote = params[i + 1];
+            i++;
+          }
+          break;
+        case "-user":
+          if (i < params.length - 1) {
+            conf.User = params[i + 1];
+            i++;
+          }
+        case "-password":
+          if (i < params.length - 1) {
+            conf.User = params[i + 1];
+            i++;
+          }
+          break;
       }
-		})
-  }
-  const delTask = () => {
-		window.go.main.App.DelTask('twWinLog').then((r) => {
-			if (r === '') {
-        info.Task = 'No'
-      } else {
-        alert.title = 'TWWinLogタスク登録解除失敗'
-        alert.message = r
-      }
-		})
-  }
+    }
+    conf.Task = info.Task;
+  };
 </script>
 
 <Alert prop={alert} />
 <fieldset>
-  <div class="field-row">TWWinLog:{ info.Status }</div>
+  <div class="field-row">twWinLog:{info.Running ? "稼働" : "停止"}</div>
   <div class="field-row">
     <label for="syslog">syslog送信先:</label>
-    <input id="syslog" type="text" style="width: 80%;" bind:value={info.Syslog} />
+    <input
+      id="syslog"
+      type="text"
+      style="width: 80%;"
+      bind:value={conf.Syslog}
+    />
   </div>
   <div class="field-row">
     <label for="remote">リモート:</label>
-    <input id="remote" type="text" bind:value={info.Remote}/>
+    <input id="remote" type="text" bind:value={conf.Remote} />
   </div>
-  {#if info.Remote }
-  <div class="field-row">
-    <label for="user">ユーザー:</label>
-    <input id="user" type="text" bind:value={info.User}/>
-    <label for="password">パスワード:</label>
-    <input id="password" type="password" bind:value={info.Password}/>
-  </div>
+  {#if info.Remote}
+    <div class="field-row">
+      <label for="user">ユーザー:</label>
+      <input id="user" type="text" bind:value={conf.User} />
+      <label for="password">パスワード:</label>
+      <input id="password" type="password" bind:value={conf.Password} />
+    </div>
   {/if}
   <div class="field-row">
     <label for="interval">送信間隔:</label>
-    <input id="interval" type="number" min="60" max="3600" bind:value={info.Interval} />
+    <input
+      id="interval"
+      type="number"
+      min="60"
+      max="3600"
+      bind:value={conf.Interval}
+    />
     <label for="interval">秒</label>
+    <input type="checkbox" id="winlog_task" bind:checked={conf.Task} />
+    <label for="winlog_task">スケジューラー</label>
   </div>
   <div class="field-row">
-    {#if info.Status === '稼働中'}
+    {#if info.Running}
       <button on:click={stop}>停止</button>
     {:else}
       <button on:click={start}>起動</button>
-    {/if}
-    {#if info.Task == 'No' }
-      <button on:click={addTask}>タスク登録</button>
-    {:else if info.Task == 'Yes' }
-      <button on:click={delTask}>タスク登録解除</button>
     {/if}
   </div>
 </fieldset>
 
 <style>
-	label {
-		width:  80px;
-		margin-left: 10px;
-	}
-	input[type="number"] {
-		width: 50px;
-	}
+  label {
+    width: 80px;
+    margin-left: 10px;
+  }
+  input[type="number"] {
+    width: 50px;
+  }
 </style>
