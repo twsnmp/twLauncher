@@ -5,30 +5,6 @@ const go = {
   "main": {
     "App": {
       /**
-       * AddTask
-       * @param {string} arg1 - Go Type: string
-       * @param {string} arg2 - Go Type: string
-       * @returns {Promise<string>}  - Go Type: string
-       */
-      "AddTask": (arg1, arg2) => {
-        return window.go.main.App.AddTask(arg1, arg2);
-      },
-      /**
-       * Close
-       * @returns {Promise<string>}  - Go Type: string
-       */
-      "Close": () => {
-        return window.go.main.App.Close();
-      },
-      /**
-       * DelTask
-       * @param {string} arg1 - Go Type: string
-       * @returns {Promise<string>}  - Go Type: string
-       */
-      "DelTask": (arg1) => {
-        return window.go.main.App.DelTask(arg1);
-      },
-      /**
        * GetDataStore
        * @returns {Promise<string>}  - Go Type: string
        */

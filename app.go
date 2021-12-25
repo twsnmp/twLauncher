@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
-	"time"
+	"path"
+	"runtime"
 
 	"github.com/google/gopacket/pcap"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -29,6 +32,9 @@ func (b *App) startup(ctx context.Context) {
 	// Perform your setup here
 	b.ctx = ctx
 	wails.LogDebug(b.ctx, "startup")
+	if err := b.loadConfig(); err != nil {
+		wails.LogError(b.ctx, fmt.Sprintf("load config err=%v", err))
+	}
 }
 
 // domReady is called after the front-end dom has been loaded
@@ -41,16 +47,9 @@ func (b *App) domReady(ctx context.Context) {
 func (b *App) shutdown(ctx context.Context) {
 	// Perform your teardown here
 	wails.LogDebug(b.ctx, "shutdown")
-}
-
-// Close : プログラムをWindowから終了させる
-func (b *App) Close() string {
-	wails.LogDebug(b.ctx, "close")
-	go func() {
-		time.Sleep(time.Millisecond * 10)
-		os.Exit(0)
-	}()
-	return "ok"
+	if err := b.saveConfig(); err != nil {
+		wails.LogError(b.ctx, fmt.Sprintf("save config err=%v", err))
+	}
 }
 
 // GetDataStore : データストアのフォルダを選択する
@@ -82,8 +81,8 @@ type LanuncherInfo struct {
 func (b *App) GetInfo() LanuncherInfo {
 	return LanuncherInfo{
 		Version: fmt.Sprintf("%s(%s)", version, commit),
-		// Env:     runtime.GOOS,
-		Env:    "windows",
+		Env:     runtime.GOOS,
+		// Env:    "windows",
 		Ifaces: b.getIfaces(),
 	}
 }
@@ -107,6 +106,42 @@ func (b *App) getIfaces() []selectDataEnt {
 		})
 	}
 	return ret
+}
+
+func (b *App) loadConfig() error {
+	conf, err := getConfigName()
+	if err != nil {
+		return err
+	}
+	j, err := ioutil.ReadFile(conf)
+	if err != nil {
+		return err
+	}
+	wails.LogDebug(b.ctx, string(j))
+	b.processMap = make(map[string][]string)
+	return json.Unmarshal(j, &b.processMap)
+}
+
+func (b *App) saveConfig() error {
+	conf, err := getConfigName()
+	if err != nil {
+		return err
+	}
+	j, err := json.Marshal(&b.processMap)
+	if err != nil {
+		return err
+	}
+	wails.LogDebug(b.ctx, string(j))
+	ioutil.WriteFile(conf, j, 0600)
+	return nil
+}
+
+func getConfigName() (string, error) {
+	c, err := os.UserConfigDir()
+	if err != nil {
+		return "", err
+	}
+	return path.Join(c, "twlauncher.conf"), nil
 }
 
 // getIPv4 : LAN I/FのリストからIPv4アドレスを取得する

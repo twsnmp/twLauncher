@@ -12,12 +12,6 @@
   window.go.main.App.GetInfo().then((result) => {
     info = result;
   });
-  function closeWindow() {
-    window.go.main.App.Close().then((result) => {});
-  }
-  function minWindow() {
-    window.runtime.WindowMinimise();
-  }
 </script>
 
 <main>
@@ -26,8 +20,8 @@
       <div class="title-bar">
         <div class="title-bar-text">TWSNMP起動/設定ツール</div>
         <div class="title-bar-controls">
-          <button aria-label="Minimize" on:click={minWindow} />
-          <button aria-label="Close" on:click={closeWindow} />
+          <button aria-label="Minimize" on:click={window.runtime.WindowMinimise} />
+          <button aria-label="Close" on:click={window.runtime.Quit} />
         </div>
       </div>
     {/if}

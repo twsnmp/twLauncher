@@ -28,8 +28,6 @@
     let params = [];
     params.push("-syslog");
     params.push(conf.Syslog);
-    params.push("-iface");
-    params.push(conf.Iface);
     params.push("-interval");
     params.push(conf.Interval + "");
     if( conf.Remote) {
@@ -103,7 +101,7 @@
           }
         case "-password":
           if (i < params.length - 1) {
-            conf.User = params[i + 1];
+            conf.Password = params[i + 1];
             i++;
           }
           break;

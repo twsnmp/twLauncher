@@ -39,8 +39,6 @@
     params.push(conf.Iface);
     params.push("-interval");
     params.push(conf.Interval + "");
-    params.push("-retention");
-    params.push(conf.Retention + "");
     setAlert(
       "twWifiScan起動中",
       "twWifiScanを起動しています。お待ちください。",
