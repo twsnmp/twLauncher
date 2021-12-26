@@ -47,6 +47,7 @@
     window.go.main.App.Start("twWifiScan", params, conf.Task).then((r) => {
       if (r === "") {
         info.Running = true;
+        setAlert("", "", false);
       } else {
         setAlert("twWifiScan起動エラー", r, false);
       }
@@ -55,12 +56,13 @@
   const stop = () => {
     setAlert(
       "twWifiScan停止中",
-      "twWifiScanを起動しています。お待ちください。",
+      "twWifiScanを停止しています。お待ちください。",
       true
     );
     window.go.main.App.Stop("twWifiScan").then((r) => {
       if (r === "") {
-        info.Status = "停止";
+        info.Running = false;
+        setAlert("", "", false);
       } else {
         setAlert("twWifiScan停止エラー", r, false);
       }

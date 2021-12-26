@@ -42,16 +42,18 @@
     window.go.main.App.Start("twWinLog", params,conf.Task).then((r) => {
       if (r === "") {
         info.Running = true;
+        setAlert("", "", false);
       } else {
         setAlert("twWinLog起動エラー", r, false);
       }
     });
   };
   const stop = () => {
-    setAlert("twWinLog停止中", "twWinLogを起動しています。お待ちください。", true);
+    setAlert("twWinLog停止中", "twWinLogを停止しています。お待ちください。", true);
     window.go.main.App.Stop("twWinLog").then((r) => {
       if (r === "") {
         info.Running = false;
+        setAlert("", "", false);
       } else {
         setAlert("twWinLog停止エラー", r, false);
       }

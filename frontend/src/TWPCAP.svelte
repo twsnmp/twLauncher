@@ -45,16 +45,18 @@
     window.go.main.App.Start("twpcap", params,conf.Task).then((r) => {
       if (r === "") {
         info.Running = true;
+        setAlert("", "", false);
       } else {
         setAlert("TWPCAP起動エラー", r, false);
       }
     });
   };
   const stop = () => {
-    setAlert("TWPCAP停止中", "TWPCAPを起動しています。お待ちください。", true);
+    setAlert("TWPCAP停止中", "TWPCAPを停止しています。お待ちください。", true);
     window.go.main.App.Stop("twpcap").then((r) => {
       if (r === "") {
         info.Running = false;
+        setAlert("", "", false);
       } else {
         setAlert("TWPCAP停止エラー", r, false);
       }

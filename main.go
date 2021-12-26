@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"log"
+	"runtime"
 
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 
@@ -25,7 +26,10 @@ var commit = ""
 func main() {
 	// Create an instance of the app structure
 	app := NewApp()
-
+	myLogger := logger.NewDefaultLogger()
+	if runtime.GOOS == "windows" {
+		myLogger = logger.NewFileLogger("./twl.log")
+	}
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:             "TWSNMP起動/設定ツール",
@@ -42,6 +46,7 @@ func main() {
 		HideWindowOnClose: false,
 		RGBA:              &options.RGBA{R: 33, G: 37, B: 43, A: 255},
 		Assets:            assets,
+		Logger:            myLogger,
 		LogLevel:          logger.DEBUG,
 		OnStartup:         app.startup,
 		OnDomReady:        app.domReady,

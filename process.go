@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/mitchellh/go-ps"
@@ -30,18 +31,36 @@ func (b *App) GetProcessInfo(name string) ProcessInfo {
 	return ProcessInfo{
 		Running: b.findProcess(name) != nil,
 		Params:  params,
-		Task:    false,
+		Task:    b.findTask(name) == nil,
 	}
 }
 
 // Start : プロセスを起動する
 func (b *App) Start(name string, params []string, task bool) string {
 	wails.LogDebug(b.ctx, fmt.Sprintf("Start name=%s,params=%v", name, params))
+	if task {
+		if err := b.endTask(name); err != nil {
+			wails.LogError(b.ctx, fmt.Sprintf("end task name=%v err=%v", name, err))
+		}
+		if err := b.deleteTask(name); err != nil {
+			wails.LogError(b.ctx, fmt.Sprintf("delete task name=%v err=%v", name, err))
+		}
+		if err := b.createTask(name, params); err != nil {
+			wails.LogError(b.ctx, fmt.Sprintf("create task name=%v err=%v", name, err))
+			return fmt.Sprintf("タスクを登録できません:%v", err)
+		}
+		if err := b.runTask(name); err != nil {
+			wails.LogError(b.ctx, fmt.Sprintf("run task name=%v err=%v", name, err))
+			return fmt.Sprintf("タスクを起動できません:%v", err)
+		}
+		b.processMap[name] = params
+		return ""
+	}
 	if p := b.findProcess(name); p != nil {
 		wails.LogDebug(b.ctx, name+" is running")
 		return ""
 	}
-	cmd := exec.Command(b.getExec(name), params...)
+	cmd := getCmd(b.ctx, b.getExec(name), params)
 	if err := cmd.Start(); err != nil {
 		wails.LogError(b.ctx, fmt.Sprintf("Start name=%v err=%v", name, err))
 		return fmt.Sprintf("起動できません err=%v", err)
@@ -59,7 +78,7 @@ func (b *App) Start(name string, params []string, task bool) string {
 func (b *App) getExec(name string) string {
 	ret := name
 	if p, err := os.Executable(); err == nil {
-		ret = path.Join(path.Dir(p), name)
+		ret = filepath.Join(filepath.Dir(p), name)
 	} else if dir, err := os.Getwd(); err == nil {
 		ret = path.Join(dir, name)
 	} else {
@@ -70,15 +89,31 @@ func (b *App) getExec(name string) string {
 	} else {
 		ret += ".exe"
 	}
+	wails.LogDebug(b.ctx, fmt.Sprintf("get exec ret=%s", ret))
 	return ret
 }
 
 // Stop: プロセスを停止する
 func (b *App) Stop(name string) string {
 	wails.LogDebug(b.ctx, fmt.Sprintf("Stop name=%v", name))
+	if b.findTask(name) == nil {
+		if err := b.endTask(name); err != nil {
+			wails.LogError(b.ctx, fmt.Sprintf("end task name=%v err=%v", name, err))
+		}
+		if err := b.deleteTask(name); err != nil {
+			wails.LogError(b.ctx, fmt.Sprintf("delete task name=%v err=%v", name, err))
+			return fmt.Sprintf("タスク削除エラー:%v", err)
+		}
+		return ""
+	}
 	if p := b.findProcess(name); p != nil {
-		p.Signal(os.Interrupt)
-		for i := 0; i < 60; i++ {
+		p.Signal(syscall.SIGINT)
+		p.Signal(syscall.SIGTERM)
+		if runtime.GOOS == "windows" {
+			p.Kill()
+			return ""
+		}
+		for i := 0; i < 5; i++ {
 			time.Sleep(time.Second * 2)
 			p := b.findProcess(name)
 			if p == nil {
