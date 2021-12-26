@@ -83,7 +83,6 @@
     return true;
   };
   const setConf = (params) => {
-    window.runtime.LogDebug("test1")
     for (let i = 0; i < params.length; i++) {
       switch (params[i]) {
         case "-syslog":
