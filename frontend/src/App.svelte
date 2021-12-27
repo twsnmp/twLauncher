@@ -35,7 +35,7 @@
     </div>
     <div class="status-bar">
       <p class="status-bar-field">
-        TWSNMP FC {info.Version} Copyright (c) 2021 Masayuki Yamai
+        twLauncher {info.Version} Copyright (c) 2021 Masayuki Yamai
       </p>
     </div>
   </div>
