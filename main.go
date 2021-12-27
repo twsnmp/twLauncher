@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"log"
+	"os"
 	"runtime"
 
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
@@ -27,7 +28,7 @@ func main() {
 	// Create an instance of the app structure
 	app := NewApp()
 	myLogger := logger.NewDefaultLogger()
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && len(os.Args) > 1 && os.Args[1] == "debug" {
 		myLogger = logger.NewFileLogger("./twl.log")
 	}
 	// Create application with options
