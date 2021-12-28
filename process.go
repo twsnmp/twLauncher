@@ -66,10 +66,11 @@ func (b *App) Start(name string, params []string, task bool) string {
 		return fmt.Sprintf("起動できません err=%v", err)
 	}
 	if cmd.Process != nil {
-		wails.LogDebug(b.ctx, "cmd.Process.Release")
-		if err := cmd.Process.Release(); err != nil {
-			wails.LogError(b.ctx, fmt.Sprintf("Start name=%v err=%v", name, err))
-		}
+		go cmd.Process.Wait()
+		// 	wails.LogDebug(b.ctx, "cmd.Process.Release")
+		// 	if err := cmd.Process.Release(); err != nil {
+		// 		wails.LogError(b.ctx, fmt.Sprintf("Start name=%v err=%v", name, err))
+		// 	}
 	}
 	b.processMap[name] = params
 	return ""
@@ -98,17 +99,21 @@ func (b *App) Stop(name string) string {
 	wails.LogDebug(b.ctx, fmt.Sprintf("Stop name=%v", name))
 	if b.findTask(name) == nil {
 		if err := b.endTask(name); err != nil {
-			wails.LogError(b.ctx, fmt.Sprintf("end task name=%v err=%v", name, err))
+			wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
 		}
 		if err := b.deleteTask(name); err != nil {
-			wails.LogError(b.ctx, fmt.Sprintf("delete task name=%v err=%v", name, err))
+			wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
 			return fmt.Sprintf("タスク削除エラー:%v", err)
 		}
 		return ""
 	}
 	if p := b.findProcess(name); p != nil {
-		p.Signal(syscall.SIGINT)
-		p.Signal(syscall.SIGTERM)
+		if err := p.Signal(syscall.SIGINT); err != nil {
+			wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
+		}
+		if err := p.Signal(syscall.SIGTERM); err != nil {
+			wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
+		}
 		if runtime.GOOS == "windows" {
 			p.Kill()
 			return ""

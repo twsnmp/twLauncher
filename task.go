@@ -13,7 +13,7 @@ import (
 // findTask : タスクを検索する
 func (b *App) findTask(name string) error {
 	if runtime.GOOS != "windows" {
-		return nil
+		return fmt.Errorf("not windows")
 	}
 	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/Query", "/TN", "\\TWSNMP\\" + name, "/XML"})
 	return cmd.Run()
