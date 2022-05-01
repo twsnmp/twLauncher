@@ -16,6 +16,7 @@
 
 # Wails bin directory
 build/bin
+build/windows/installer/tmp
 
 # IDEs
 .idea

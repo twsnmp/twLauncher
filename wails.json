@@ -16,5 +16,12 @@
   },
   "debounceMS": 100,
   "devserverurl": "http://localhost:34115",
-  "appargs": ""
+  "appargs": "",
+  "Info": {
+    "companyName": "TWSNMP",
+    "productName": "TWSNMP FC",
+    "productVersion": "1.11.0",
+    "copyright": "Copyright Masayuki Yamai",
+    "comments": "twLaouncer built using Wails (https://wails.io)"
+  }
 }
