@@ -69,7 +69,7 @@ VIAddVersionKey "ProductName"     "${INFO_PRODUCTNAME}"
 
 Name "TWSNMP FC"
 OutFile "..\..\bin\twsnmpfc-amd64-installer.exe" # Name of the installer's file.
-InstallDir "$PROGRAMFILES64\TWSNMP\TWSNMP FC" # Default installing folder ($PROGRAMFILES is Program Files folder).
+InstallDir "$PROGRAMFILES64\TWSNMP FC" # Default installing folder ($PROGRAMFILES is Program Files folder).
 ShowInstDetails show # This will always show the installation details.
 
 Function .onInit
@@ -87,8 +87,10 @@ Section
     File "/oname=twpcap.exe" "..\..\bin/twpcap.exe"
     File "/oname=twWifiScan.exe" "..\..\bin/twWifiScan.exe"
     File "/oname=twWinlog.exe" "..\..\bin/twWinlog.exe"
+    File "/oname=README.txt" "./README.txt"
 
-    CreateShortcut "$SMPROGRAMS\twLauncher.lnk" "$INSTDIR\twLauncher.exe"
+    CreateShortcut "$SMPROGRAMS\TWSNMP FC起動ツール.lnk" "$INSTDIR\twLauncher.exe"
+    CreateShortcut "$SMPROGRAMS\TWSNMP FCについて.lnk" "$INSTDIR\README.txt"
 
     !insertmacro wails.writeUninstaller
 SectionEnd
@@ -98,7 +100,8 @@ Section "uninstall"
 
     RMDir /r $INSTDIR
 
-    Delete "$SMPROGRAMS\twLauncher.lnk"
+    Delete "$SMPROGRAMS\TWSNMP FC起動ツール.lnk"
+    Delete "$SMPROGRAMS\TWSNMP FCについて.lnk"
 
     !insertmacro wails.deleteUninstaller
 SectionEnd
