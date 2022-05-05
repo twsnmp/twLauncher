@@ -99,6 +99,9 @@
     }
     conf.Task = info.Task;
   };
+  const help = () => {
+    window.runtime.BrowserOpenURL("https://note.com/twsnmp/n/nc6e49c284afb?magazine_key=meed0d0ddab5e");
+  }
 </script>
 
 <Alert prop={alert} />
@@ -130,6 +133,7 @@
     {:else}
       <button on:click={start}>起動</button>
     {/if}
+    <button on:click={help}>ヘルプ</button>
   </div>
 </fieldset>
 
