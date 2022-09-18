@@ -12,7 +12,7 @@
   "Platform": "",
   "Author": {
     "name": "twsnmp",
-    "email": "ymi@twise.co.jp"
+    "email": "twsnmp@gmail.com"
   },
   "debounceMS": 100,
   "devserverurl": "http://localhost:34115",
@@ -20,7 +20,7 @@
   "Info": {
     "companyName": "TWSNMP",
     "productName": "TWSNMP FC",
-    "productVersion": "1.11.0",
+    "productVersion": "1.14.0",
     "copyright": "Copyright Masayuki Yamai",
     "comments": "twLaouncer built using Wails (https://wails.io)"
   }
