@@ -45,7 +45,7 @@ func main() {
 		Frameless:         false,
 		StartHidden:       false,
 		HideWindowOnClose: false,
-		RGBA:              &options.RGBA{R: 33, G: 37, B: 43, A: 255},
+		BackgroundColour:  &options.RGBA{R: 33, G: 37, B: 43, A: 255},
 		Assets:            assets,
 		Logger:            myLogger,
 		LogLevel:          logger.DEBUG,
