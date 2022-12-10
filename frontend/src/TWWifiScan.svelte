@@ -117,7 +117,7 @@
     if (conf.Interval < 60) {
       conf.Interval = 600;
     }
-    conf.Task = info.Task;
+    conf.Task = info.Task && env == "windows";
   };
 </script>
 

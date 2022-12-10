@@ -97,7 +97,7 @@
           conf.Local = true;
       }
     }
-    conf.Task = info.Task;
+    conf.Task = info.Task && env == "windows";
   };
   const help = () => {
     window.runtime.BrowserOpenURL("https://note.com/twsnmp/n/nc6e49c284afb?magazine_key=meed0d0ddab5e");

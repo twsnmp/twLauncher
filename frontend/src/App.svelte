@@ -29,8 +29,8 @@
       <TWSNMP env={info.Env} />
       <TWPCAP env={info.Env} ifaces={info.Ifaces} />
       <TWWifiScan env={info.Env} ifaces={info.Ifaces} />
-      {#if info.Env === "windows"}
-        <TWWinLog />
+      {#if info.Env === "windows" || info.Env === "winStore"}
+        <TWWinLog env={info.Env} />
       {/if}
     </div>
     <div class="status-bar">

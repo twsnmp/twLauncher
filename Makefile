@@ -1,6 +1,6 @@
-.PHONY: all clean windows mac
+.PHONY: all clean windows mac windebug wininstaller
 ### バージョンの定義
-VERSION     := "v1.16.0"
+VERSION     := "v1.17.0"
 COMMIT      := $(shell git rev-parse --short HEAD)
 
 ### コマンドの定義
@@ -13,11 +13,15 @@ clean:
 	rm -rf build/bin/twLauncher*
 	rm -rf build/bin/*.exe
 
-windows: build/bin/twsnmpfc-amd64-installer.exe
+windows: build/bin/twLauncher.exe
 
 mac:
 	wails build  -platform darwin -ldflags $(LDFLAGS)
 
+wininstaller: build/bin/twsnmpfc-amd64-installer.exe
+
+windebug:
+	wails build  -platform windows -debug
 
 build/bin/twsnmpfc-amd64-installer.exe: build/bin/twsnmpfc.exe build/bin/twpcap.exe build/bin/twWifiScan.exe build/bin/twWinlog.exe build/bin/twLauncher.exe
 	wails build  -platform windows/amd64 -ldflags $(LDFLAGS) -nsis

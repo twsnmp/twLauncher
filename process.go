@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"path"
 	"path/filepath"
@@ -67,10 +68,6 @@ func (b *App) Start(name string, params []string, task bool) string {
 	}
 	if cmd.Process != nil {
 		go cmd.Process.Wait()
-		// 	wails.LogDebug(b.ctx, "cmd.Process.Release")
-		// 	if err := cmd.Process.Release(); err != nil {
-		// 		wails.LogError(b.ctx, fmt.Sprintf("Start name=%v err=%v", name, err))
-		// 	}
 	}
 	b.processMap[name] = params
 	return ""
@@ -98,6 +95,18 @@ func (b *App) getExec(name string) string {
 func (b *App) Stop(name string) string {
 	wails.LogDebug(b.ctx, fmt.Sprintf("Stop name=%v", name))
 	if b.findTask(name) == nil {
+		if runtime.GOOS == "windows" {
+			if name == "twsnmpfc" {
+				for i := 0; i < 15; i++ {
+					p := b.findProcess(name)
+					if p == nil {
+						break
+					}
+					b.stopByUdp(p.Pid)
+					time.Sleep(time.Second * 2)
+				}
+			}
+		}
 		if err := b.endTask(name); err != nil {
 			wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
 		}
@@ -115,8 +124,19 @@ func (b *App) Stop(name string) string {
 			wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
 		}
 		if runtime.GOOS == "windows" {
-			p.Kill()
-			return ""
+			if name == "twsnmpfc" {
+				for i := 0; i < 15; i++ {
+					b.stopByUdp(p.Pid)
+					time.Sleep(time.Second * 2)
+					p := b.findProcess(name)
+					if p == nil {
+						return ""
+					}
+				}
+			} else {
+				p.Kill()
+				return ""
+			}
 		}
 		for i := 0; i < 5; i++ {
 			time.Sleep(time.Second * 2)
@@ -151,4 +171,17 @@ func (b *App) findProcess(name string) *os.Process {
 	return nil
 }
 
-// findTask : タスクスケジューラのタスクを検索する
+func (b *App) stopByUdp(pid int) {
+	for i := 8080; i < 8180; i++ {
+		func() {
+			conn, err := net.Dial("udp4", fmt.Sprintf("127.0.0.1:%d", i))
+			if err == nil {
+				defer conn.Close()
+				_, err = conn.Write([]byte(fmt.Sprintf("%d", pid)))
+				if err != nil {
+					wails.LogError(b.ctx, fmt.Sprintf("stopByUdp pid=%v err=%v", pid, err))
+				}
+			}
+		}()
+	}
+}

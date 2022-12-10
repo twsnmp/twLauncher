@@ -117,7 +117,7 @@
     if (conf.Retention < 600) {
       conf.Retention = 3600;
     }
-    conf.Task = info.Task;
+    conf.Task = info.Task && env == "windows";
   };
 </script>
 

@@ -1,6 +1,7 @@
 <script>
   import "../node_modules/98.css/dist/98.css";
   import Alert from "./Alert.svelte";
+  export let env = "";
   let info = {
     Params: [],
     Running: false,
@@ -109,7 +110,7 @@
           break;
       }
     }
-    conf.Task = info.Task;
+    conf.Task = info.Task && env == "windows";
   };
 </script>
 
@@ -147,8 +148,10 @@
       bind:value={conf.Interval}
     />
     <label for="interval">秒</label>
-    <input type="checkbox" id="winlog_task" bind:checked={conf.Task} />
-    <label for="winlog_task">スケジューラー</label>
+    {#if env == "windows"}
+      <input type="checkbox" id="winlog_task" bind:checked={conf.Task} />
+      <label for="winlog_task">スケジューラー</label>
+    {/if}
   </div>
   <div class="field-row">
     {#if info.Running}

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strings"
 
 	"github.com/google/gopacket/pcap"
 	wails "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -79,11 +80,18 @@ type LanuncherInfo struct {
 
 // GetInfo : ランチャー情報の取得
 func (b *App) GetInfo() LanuncherInfo {
+	env := runtime.GOOS
+	if env == "windows" {
+		if p, err := os.Executable(); err == nil {
+			if strings.Contains(p, "WindowsApps") {
+				env = "winStore"
+			}
+		}
+	}
 	return LanuncherInfo{
 		Version: fmt.Sprintf("%s(%s)", version, commit),
-		Env:     runtime.GOOS,
-		// Env:    "windows",
-		Ifaces: b.getIfaces(),
+		Env:     env,
+		Ifaces:  b.getIfaces(),
 	}
 }
 
