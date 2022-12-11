@@ -4,6 +4,7 @@
   import Alert from "./Alert.svelte";
   export let env = "";
   export let ifaces = [];
+  export let pcapVersion= "";
   let info = {
     Params: [],
     Running: false,
@@ -118,62 +119,83 @@
       conf.Retention = 3600;
     }
     conf.Task = info.Task && env == "windows";
-  };
+  }
+  const help = () => {
+    window.runtime.BrowserOpenURL("https://zenn.dev/twsnmp/books/twsnmpfc-manual/viewer/sensors");
+  }
 </script>
 
 <Alert prop={alert} />
-<fieldset>
-  <div class="field-row">TWPCAP:{info.Running ? "稼働" : "停止"}</div>
-  <div class="field-row">
-    <label for="syslog">syslog送信先:</label>
-    <input
-      id="syslog"
-      type="text"
-      style="width: 80%;"
-      bind:value={conf.Syslog}
-    />
-  </div>
-  <div class="field-row">
-    <label for="iface">LAN I/F:</label>
-    <select id="iface" bind:value={conf.Iface}>
-      {#each ifaces as i}
-        <option value={i.Value}>{i.Text}</option>
-      {/each}
-    </select>
-  </div>
-  <div class="field-row">
-    <label for="interval">送信間隔:</label>
-    <input
-      id="interval"
-      type="number"
-      min="60"
-      max="3600"
-      bind:value={conf.Interval}
-    />
-    <label for="interval">秒</label>
-    <label for="retention">保存時間:</label>
-    <input id="retention" type="number" min="600" bind:value={conf.Retention} />
-    <label for="retention">秒</label>
-    {#if env == "windows"}
-      <input type="checkbox" id="twpcap_task" bind:checked={conf.Task} />
-      <label for="twpcap_task">スケジューラー</label>
-    {/if}
-  </div>
-  <div class="field-row">
-    {#if info.Running}
-      <button on:click={stop}>停止</button>
-    {:else}
-      <button on:click={start}>起動</button>
-    {/if}
-  </div>
-</fieldset>
-
+{#if pcapVersion == ""}
+  <fieldset>
+    <legend>TWPCAP</legend>
+    <div class="field-row" id="nopcap">
+      <span>
+        PCAPライブラリをインストールしてください。
+      </span>
+    </div>
+    <div class="field-row">
+      <button on:click={help}>ヘルプ</button>
+    </div>  
+  </fieldset>
+{:else}
+  <fieldset>
+    <legend>パケットキャプチャーセンサー(TWPCAP)</legend>
+    <div class="field-row">
+      <label for="status">状態</label>
+      <input id="status" disabled type="text" value="{info.Running ? '稼働' : '停止'}"/>
+    </div>
+    <div class="field-row">
+      <label for="pcap">PCAP Version:</label>
+      <input id="pcap" disabled type="text" value="{pcapVersion}"/>
+    </div>
+    <div class="field-row">
+      <label for="syslog">syslog送信先:</label>
+      <input
+        id="syslog"
+        type="text"
+        style="width: 80%;"
+        bind:value={conf.Syslog}
+      />
+    </div>
+    <div class="field-row">
+      <label for="iface">LAN I/F:</label>
+      <select id="iface" bind:value={conf.Iface}>
+        {#each ifaces as i}
+          <option value={i.Value}>{i.Text}</option>
+        {/each}
+      </select>
+    </div>
+    <div class="field-row">
+      <label for="interval">送信間隔:</label>
+      <input
+        id="interval"
+        type="number"
+        min="60"
+        max="3600"
+        bind:value={conf.Interval}
+      />
+      <label for="interval">秒</label>
+      <label for="retention">保存時間:</label>
+      <input id="retention" type="number" min="600" bind:value={conf.Retention} />
+      <label for="retention">秒</label>
+      {#if env == "windows"}
+        <input type="checkbox" id="twpcap_task" bind:checked={conf.Task} />
+        <label for="twpcap_task">スケジューラー</label>
+      {/if}
+    </div>
+    <div class="field-row">
+      {#if info.Running}
+        <button on:click={stop}>停止</button>
+      {:else}
+        <button on:click={start}>起動</button>
+      {/if}
+    </div>
+  </fieldset>
+{/if}
 <style>
-  label {
-    width: 80px;
-    margin-left: 10px;
-  }
-  input[type="number"] {
-    width: 50px;
-  }
+ #nopcap {
+  font-size: 24px;
+  color: darkred;
+ } 
 </style>

@@ -100,13 +100,17 @@
     conf.Task = info.Task && env == "windows";
   };
   const help = () => {
-    window.runtime.BrowserOpenURL("https://note.com/twsnmp/n/nc6e49c284afb?magazine_key=meed0d0ddab5e");
+    window.runtime.BrowserOpenURL("https://zenn.dev/twsnmp/books/twsnmpfc-manual");
   }
 </script>
 
 <Alert prop={alert} />
 <fieldset>
-  <div class="field-row">TWSNMP FC: {info.Running ? "稼働中" : "停止"}</div>
+  <legend>TWSNMP FC</legend>
+  <div class="field-row">
+    <label for="status">状態</label>
+    <input id="status" disabled type="text" value="{info.Running ? '稼働' : '停止'}"/>
+  </div>
   <div class="field-row">
     <label for="datastore">データストア:</label>
     <input id="datastore" type="text" bind:value={conf.DataStore} />
@@ -138,10 +142,6 @@
 </fieldset>
 
 <style>
-  label {
-    width: 80px;
-    margin-left: 10px;
-  }
   #datastore {
     width: 80%;
   }

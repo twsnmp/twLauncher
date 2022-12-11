@@ -1,4 +1,4 @@
-.PHONY: all clean windows mac windebug wininstaller
+.PHONY: all clean windows mac windebug wininstaller dev
 ### バージョンの定義
 VERSION     := "v1.17.0"
 COMMIT      := $(shell git rev-parse --short HEAD)
@@ -22,6 +22,9 @@ wininstaller: build/bin/twsnmpfc-amd64-installer.exe
 
 windebug:
 	wails build  -platform windows -debug
+
+dev:
+	 wails dev -e go,svelte
 
 build/bin/twsnmpfc-amd64-installer.exe: build/bin/twsnmpfc.exe build/bin/twpcap.exe build/bin/twWifiScan.exe build/bin/twWinlog.exe build/bin/twLauncher.exe
 	wails build  -platform windows/amd64 -ldflags $(LDFLAGS) -nsis

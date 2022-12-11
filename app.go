@@ -73,9 +73,10 @@ type selectDataEnt struct {
 
 // LanuncherInfo : ランチャーの情報
 type LanuncherInfo struct {
-	Version string
-	Env     string
-	Ifaces  []selectDataEnt
+	Version     string
+	Env         string
+	Ifaces      []selectDataEnt
+	PcapVersion string
 }
 
 // GetInfo : ランチャー情報の取得
@@ -89,10 +90,21 @@ func (b *App) GetInfo() LanuncherInfo {
 		}
 	}
 	return LanuncherInfo{
-		Version: fmt.Sprintf("%s(%s)", version, commit),
-		Env:     env,
-		Ifaces:  b.getIfaces(),
+		Version:     fmt.Sprintf("%s(%s)", version, commit),
+		Env:         env,
+		Ifaces:      b.getIfaces(),
+		PcapVersion: b.pcapVersion(),
 	}
+}
+
+func (b *App) pcapVersion() string {
+	_, err := pcap.FindAllDevs()
+	if err != nil {
+		wails.LogError(b.ctx, fmt.Sprintf("pcapVersion err=%v", err))
+		return ""
+	}
+	wails.LogInfo(b.ctx, pcap.Version())
+	return pcap.Version()
 }
 
 func (b *App) getIfaces() []selectDataEnt {

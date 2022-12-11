@@ -8,6 +8,7 @@
     Version: "",
     Env: "",
     Ifaces: [],
+    PcapVersion: "",
   };
   window.go.main.App.GetInfo().then((result) => {
     info = result;
@@ -27,8 +28,8 @@
     {/if}
     <div class="window-body" data-wails-no-drag>
       <TWSNMP env={info.Env} />
-      <TWPCAP env={info.Env} ifaces={info.Ifaces} />
-      <TWWifiScan env={info.Env} ifaces={info.Ifaces} />
+      <TWPCAP env={info.Env} ifaces={info.Ifaces} pcapVersion={info.PcapVersion} />
+      <TWWifiScan env={info.Env} />
       {#if info.Env === "windows" || info.Env === "winStore"}
         <TWWinLog env={info.Env} />
       {/if}
@@ -56,4 +57,22 @@
     position: absolute;
     bottom: 0;
   }
+ :global(fieldset+fieldset) {
+    margin-top: 10px;
+  }
+  :global(label) {
+    width: 80px;
+    margin-left: 10px;
+  }
+  :global(input[type="number"]) {
+    width: 50px;
+  }
+  :global(fieldset input[type="text"]) {
+    line-height: normal;
+  }
+  :global(input[type="text"]:disabled) {
+    color: black;
+    line-height: normal;
+  }
+
 </style>

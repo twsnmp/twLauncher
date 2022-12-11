@@ -116,7 +116,11 @@
 
 <Alert prop={alert} />
 <fieldset>
-  <div class="field-row">twWinLog:{info.Running ? "稼働" : "停止"}</div>
+  <legend>Windowsイベントログセンサー(twWinLog)</legend>
+  <div class="field-row">
+    <label for="status">状態</label>
+    <input id="status" disabled type="text" value="{info.Running ? '稼働' : '停止'}"/>
+  </div>
   <div class="field-row">
     <label for="syslog">syslog送信先:</label>
     <input
@@ -161,13 +165,3 @@
     {/if}
   </div>
 </fieldset>
-
-<style>
-  label {
-    width: 80px;
-    margin-left: 10px;
-  }
-  input[type="number"] {
-    width: 50px;
-  }
-</style>
