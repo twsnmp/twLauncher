@@ -94,8 +94,9 @@ func (b *App) getExec(name string) string {
 // Stop: プロセスを停止する
 func (b *App) Stop(name string) string {
 	wails.LogDebug(b.ctx, fmt.Sprintf("Stop name=%v", name))
-	if b.findTask(name) == nil {
-		if runtime.GOOS == "windows" {
+	info := b.GetInfo()
+	if info.Env == "windows" {
+		if b.findTask(name) == nil {
 			if name == "twsnmpfc" {
 				for i := 0; i < 15; i++ {
 					p := b.findProcess(name)
@@ -106,15 +107,15 @@ func (b *App) Stop(name string) string {
 					time.Sleep(time.Second * 2)
 				}
 			}
+			if err := b.endTask(name); err != nil {
+				wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
+			}
+			if err := b.deleteTask(name); err != nil {
+				wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
+				return fmt.Sprintf("タスク削除エラー:%v", err)
+			}
+			return ""
 		}
-		if err := b.endTask(name); err != nil {
-			wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
-		}
-		if err := b.deleteTask(name); err != nil {
-			wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
-			return fmt.Sprintf("タスク削除エラー:%v", err)
-		}
-		return ""
 	}
 	if p := b.findProcess(name); p != nil {
 		if err := p.Signal(syscall.SIGINT); err != nil {
