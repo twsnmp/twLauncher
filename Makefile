@@ -1,6 +1,6 @@
 .PHONY: all clean windows mac windebug wininstaller dev
 ### バージョンの定義
-VERSION     := "v1.18.0"
+VERSION     := "v1.19.0"
 COMMIT      := $(shell git rev-parse --short HEAD)
 
 ### コマンドの定義
@@ -43,3 +43,6 @@ build/bin/twWifiScan.exe: ../twWifiScan/dist/twWifiScan.exe
 
 build/bin/twWinlog.exe: ../twWinlog/dist/twWinlog.exe
 	cp ../twWinlog/dist/twWinlog.exe build/bin/
+
+build/bin/twhr2trap.exe: ../twhr2trap/dist/twhr2trap.exe
+	cp ../twhr2trap/dist/twhr2trap.exe build/bin/
