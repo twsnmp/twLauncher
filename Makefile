@@ -18,7 +18,7 @@ windows: build/bin/twLauncher.exe
 mac: build/bin/twLauncher.app/Contents/MacOS/twLauncher
 
 build/bin/twLauncher.app/Contents/MacOS/twLauncher:
-	wails build  -platform darwin -clean -ldflags $(LDFLAGS)
+	wails build  -platform darwin -ldflags $(LDFLAGS)
 
 windebug:
 	wails build  -platform windows -debug -clean
@@ -27,4 +27,4 @@ dev:
 	 wails dev -e go,svelte
 
 build/bin/twLauncher.exe: 
-	wails build  -platform windows/amd64 -clean -ldflags $(LDFLAGS)
+	wails build  -platform windows/amd64  -ldflags $(LDFLAGS)
