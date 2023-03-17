@@ -15,34 +15,16 @@ clean:
 
 windows: build/bin/twLauncher.exe
 
-mac:
-	wails build  -platform darwin -ldflags $(LDFLAGS)
+mac: build/bin/twLauncher.app/Contents/MacOS/twLauncher
 
-wininstaller: build/bin/twsnmpfc-amd64-installer.exe
+build/bin/twLauncher.app/Contents/MacOS/twLauncher:
+	wails build  -platform darwin -clean -ldflags $(LDFLAGS)
 
 windebug:
-	wails build  -platform windows -debug
+	wails build  -platform windows -debug -clean
 
 dev:
 	 wails dev -e go,svelte
 
-build/bin/twsnmpfc-amd64-installer.exe: build/bin/twsnmpfc.exe build/bin/twpcap.exe build/bin/twWifiScan.exe build/bin/twWinlog.exe build/bin/twLauncher.exe
-	wails build  -platform windows/amd64 -ldflags $(LDFLAGS) -nsis
-
 build/bin/twLauncher.exe: 
-	wails build  -platform windows/amd64 -ldflags $(LDFLAGS)
-
-build/bin/twsnmpfc.exe: ../twsnmpfc/dist/twsnmpfc.exe
-	cp ../twsnmpfc/dist/twsnmpfc.exe build/bin/
-
-build/bin/twpcap.exe: ../twpcap/dist/twpcap.exe
-	cp ../twpcap/dist/twpcap.exe build/bin/
-
-build/bin/twWifiScan.exe: ../twWifiScan/dist/twWifiScan.exe
-	cp ../twWifiScan/dist/twWifiScan.exe build/bin/
-
-build/bin/twWinlog.exe: ../twWinlog/dist/twWinlog.exe
-	cp ../twWinlog/dist/twWinlog.exe build/bin/
-
-build/bin/twhr2trap.exe: ../twhr2trap/dist/twhr2trap.exe
-	cp ../twhr2trap/dist/twhr2trap.exe build/bin/
+	wails build  -platform windows/amd64 -clean -ldflags $(LDFLAGS)
