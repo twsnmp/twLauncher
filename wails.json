@@ -1,26 +1,19 @@
 {
+  "$schema": "https://wails.io/schemas/config.v2.json",
   "name": "twLauncher",
+  "outputfilename": "twLauncher",
   "frontend:build": "npm run build",
   "frontend:install": "npm install",
-  "frontend:dev": "",
-  "wailsjsdir": "./frontend",
-  "version": "2",
-  "Path": "",
-  "BuildDir": "",
-  "outputfilename": "twLauncher",
-  "OutputType": "",
-  "Platform": "",
-  "Author": {
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
     "name": "twsnmp",
     "email": "twsnmp@gmail.com"
   },
-  "debounceMS": 100,
-  "devserverurl": "http://localhost:34115",
-  "appargs": "",
   "Info": {
     "companyName": "TWSNMP",
     "productName": "TWSNMP FC",
-    "productVersion": "1.14.0",
+    "productVersion": "1.32.0",
     "copyright": "Copyright Masayuki Yamai",
     "comments": "twLaouncer built using Wails (https://wails.io)"
   }
