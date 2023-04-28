@@ -1,6 +1,5 @@
 <script>
   import { afterUpdate } from "svelte";
-  import "../node_modules/98.css/dist/98.css";
   import Alert from "./Alert.svelte";
   export let env = "";
   export let ifaces = [];

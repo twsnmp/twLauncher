@@ -1,5 +1,4 @@
 <script>
-  import "../node_modules/98.css/dist/98.css";
   export let prop = {
     title: "",
     message: "",

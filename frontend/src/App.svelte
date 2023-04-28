@@ -1,5 +1,4 @@
 <script>
-  import "../node_modules/98.css/dist/98.css";
   import TWSNMP from "./TWSNMP.svelte";
   import TWPCAP from "./TWPCAP.svelte";
   import TWWifiScan from "./TWWifiScan.svelte";

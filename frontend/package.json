@@ -12,8 +12,5 @@
     "svelte": "^3.49.0",
     "vite": "^3.0.0"
   },
-  "dependencies": {
-    "98.css": "^0.1.17"
-  },
   "author": "twsnmp"
 }
