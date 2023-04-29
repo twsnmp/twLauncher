@@ -9,8 +9,20 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
+    "autoprefixer": "^10.4.7",
+    "postcss": "^8.4.14",
+    "postcss-load-config": "^4.0.1",
     "svelte": "^3.49.0",
+    "svelte-preprocess": "^5.0.3",
+    "tailwindcss": "^3.1.5",
     "vite": "^3.0.0"
   },
-  "author": "twsnmp"
+  "author": "twsnmp",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.4.0",
+    "@popperjs/core": "^2.11.7",
+    "classnames": "^2.3.2",
+    "flowbite": "^1.6.5",
+    "flowbite-svelte": "^0.34.9"
+  }
 }
