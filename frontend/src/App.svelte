@@ -60,6 +60,7 @@
   };
 
   let proceses = [];
+  let waitModal = false;
 
   onMount(async () => {
     const r = await GetInfo();
@@ -76,33 +77,41 @@
 
   const startProcess = async (name, params, task) => {
     infoMsg = name + "を起動しています。お待ち下さい。";
+    waitModal = true;
     if (oldName) {
       await Delete(oldName);
       oldName = "";
     }
     const r = await Start(name, params, task);
-    if (r != "") {
+    infoMsg = "";
+    if (r == "") {
+      waitModal = false;
+    } else {
       errorMsg = name + "起動エラー:" + r;
     }
     await updateProcessList();
-    infoMsg = "";
   };
 
   const stopProcess = async (name) => {
     infoMsg = name + "を停止しています。お待ち下さい。";
+    waitModal = true;
     const r = await Stop(name);
-    if (r != "") {
+    infoMsg = "";
+    if (r == "") {
+      waitModal = false;
+    } else {
       errorMsg = name + "停止エラー:" + r;
     }
     await updateProcessList();
-    infoMsg = "";
   };
 
   const deleteProcess = async (name) => {
     infoMsg = name + "を削除しています。お待ち下さい。";
+    waitModal = true;
     const r = await Delete(name);
+    infoMsg = "";
     if (r === "") {
-      infoMsg = "";
+      waitModal = false;
     } else {
       errorMsg = name + "削除エラー:" + r;
     }
@@ -269,24 +278,14 @@
   </NavBrand>
   <div class="flex">
     <DarkMode />
+    <Button class="!p-2 ml-2 text-xl" color="teal" on:click={()=>updateProcessList()}>
+      <i class="fa-solid fa-rotate"></i>
+    </Button>
     <Button class="!p-2 ml-2 text-xl" color="teal" on:click={help}>
       <i class="fa-regular fa-circle-question" />
     </Button>
   </div>
 </Navbar>
-
-{#if infoMsg != ""}
-  <Alert>
-    <i class="fa-solid fa-circle-info" />
-    {infoMsg}
-  </Alert>
-{/if}
-{#if errorMsg != ""}
-  <Alert color="red">
-    <i class="fa-solid fa-triangle-exclamation" />
-    {errorMsg}
-  </Alert>
-{/if}
 
 <Table hoverable={true}>
   <TableHead>
@@ -415,3 +414,20 @@
   show={twWinLogModal}
   on:done={handleDone}
 />
+
+<Modal bind:open={waitModal} size="xs" autoclose={false}>
+  {#if infoMsg != ""}
+  <Alert>
+    <i class="fa-solid fa-circle-info" />
+    {infoMsg}
+  </Alert>
+{/if}
+{#if errorMsg != ""}
+  <Alert color="red">
+    <i class="fa-solid fa-triangle-exclamation" />
+    {errorMsg}
+  </Alert>
+  <Button color="alternative" on:click={()=>{waitModal=false;errorMsg="";}}>閉じる</Button>
+{/if}
+
+</Modal>

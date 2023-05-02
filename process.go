@@ -1,9 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"net"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -29,14 +30,38 @@ func (b *App) GetProcessInfoList() []ProcessInfo {
 	wails.LogDebug(b.ctx, "GetProcessInfoList")
 	ret := []ProcessInfo{}
 	for name, params := range b.processMap {
+		task := false
+		running := false
+		if strings.HasPrefix(name, "http") {
+			running = b.checkUrl(name)
+		} else {
+			running = b.findProcess(name) != nil
+			task = b.findTask(name) != nil
+		}
 		ret = append(ret, ProcessInfo{
 			Name:    name,
 			Params:  params,
-			Running: b.findProcess(name) != nil,
-			Task:    b.findTask(name) != nil,
+			Running: running,
+			Task:    task,
 		})
 	}
 	return ret
+}
+
+func (b *App) checkUrl(url string) bool {
+	ctx, cancel := context.WithTimeout(b.ctx, 10*time.Second)
+	defer cancel()
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return false
+	}
+	req = req.WithContext(ctx)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return false
+	}
+	defer res.Body.Close()
+	return res.StatusCode < 400
 }
 
 func (b *App) DeleteProcess(name string) string {
@@ -80,6 +105,10 @@ func (b *App) Start(name string, params []string, task bool) string {
 	}
 	b.processMap[name] = params
 	return ""
+}
+
+func (b *App) Save(name string) {
+	b.processMap[name] = []string{}
 }
 
 func (b *App) getExec(name string) string {
@@ -194,11 +223,8 @@ func (b *App) findProcess(name string) *process.Process {
 	for _, p := range list {
 		if n, err := p.Name(); err != nil || !strings.HasPrefix(n, name) {
 			continue
-		} else {
-			log.Println(n)
 		}
 		if cls, err := p.CmdlineSlice(); err == nil && len(cls) > 1 && cmpArgs(params, cls[1:]) {
-			log.Println("hit")
 			return p
 		}
 	}
@@ -207,8 +233,6 @@ func (b *App) findProcess(name string) *process.Process {
 }
 
 func cmpArgs(s, p []string) bool {
-	log.Println(s)
-	log.Println(p)
 	if len(s) != len(p) {
 		return false
 	}

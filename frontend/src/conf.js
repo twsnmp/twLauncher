@@ -86,7 +86,7 @@ export const getConfFromParams = (info,params, task) => {
         break;
       case "-port":
         if (i < params.length - 1) {
-          conf.Password = params[i + 1] * 1;
+          conf.Port = params[i + 1] * 1;
           i++;
         }
         break;
