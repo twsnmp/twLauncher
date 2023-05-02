@@ -1,200 +1,140 @@
 <script>
-  import { afterUpdate } from "svelte";
-  import Alert from "./Alert.svelte";
-  export let env = "";
-  export let ifaces = [];
-  export let pcapVersion= "";
-  let info = {
-    Params: [],
-    Running: false,
-    Task: false,
+  import { createEventDispatcher } from "svelte";
+  import {
+    Button,
+    Modal,
+    Label,
+    Input,
+    Toggle,
+    Alert,
+    Select,
+    Helper,
+  } from "flowbite-svelte";
+
+  export let show = false;
+  export let info = {
+    Version: "",
+    Env: "",
+    Ifaces: [],
+    PcapVersion: "",
   };
-  let conf = {
+
+  export let conf = {
     Syslog: "",
     Interval: 600,
     Retention: 3600,
     Iface: "",
+    Task: false,
   };
-  let alert = {
-    title: "",
-    message: "",
+
+  let syslogError = false;
+  let ifaceError = false;
+
+  const dispatch = createEventDispatcher();
+
+  const cancel = () => {
+    syslogError = false;
+    ifaceError = false;
+    dispatch("done", {
+      type: "twpcap",
+      start: false,
+    });
   };
-  window.go.main.App.GetProcessInfo("twpcap").then((r) => {
-    info = r;
-    setConf(info.Params);
-  });
-  afterUpdate(() => {
-    if (!conf.Iface) {
-      conf.Iface = ifaces && ifaces.length > 0 ? ifaces[0].Value : "";
-    }
-	});
+
   const start = () => {
     if (!checkParams()) {
       return;
     }
-    let params = [];
-    params.push("-syslog");
-    params.push(conf.Syslog);
-    params.push("-iface");
-    params.push(conf.Iface);
-    params.push("-interval");
-    params.push(conf.Interval + "");
-    params.push("-retention");
-    params.push(conf.Retention + "");
-    setAlert("TWPCAP起動中", "TWPCAPを起動しています。お待ちください。", true);
-    window.go.main.App.Start("twpcap", params,conf.Task).then((r) => {
-      if (r === "") {
-        info.Running = true;
-        setAlert("", "", false);
-      } else {
-        setAlert("TWPCAP起動エラー", r, false);
-      }
+    dispatch("done", {
+      type: "twpcap",
+      start: true,
+      conf: conf,
     });
-  };
-  const stop = () => {
-    setAlert("TWPCAP停止中", "TWPCAPを停止しています。お待ちください。", true);
-    window.go.main.App.Stop("twpcap").then((r) => {
-      if (r === "") {
-        info.Running = false;
-        setAlert("", "", false);
-      } else {
-        setAlert("TWPCAP停止エラー", r, false);
-      }
-    });
-  };
-  const setAlert = (t, m, w) => {
-    alert.title = t;
-    alert.message = m;
-    alert.wait = w;
   };
   const checkParams = () => {
+    syslogError = false;
+    ifaceError = false;
     if (!conf.Syslog) {
-      setAlert(
-        "TWPCAPパラメータエラー",
-        "Syslogの送信先を指定してください。",
-        false
-      );
+      syslogError = true;
       return false;
     }
     if (!conf.Iface) {
-      setAlert("TWPCAPパラメータエラー", "LAN I/Fを指定してください。", false);
+      ifaceError = true;
       return false;
     }
     return true;
   };
-  const setConf = (params) => {
-    for (let i = 0; i < params.length; i++) {
-      switch (params[i]) {
-        case "-syslog":
-          if (i < params.length - 1) {
-            conf.Syslog = params[i + 1];
-            i++;
-          }
-          break;
-        case "-iface":
-          if (i < params.length - 1) {
-            conf.Iface = params[i + 1];
-            i++;
-          }
-          break;
-        case "-interval":
-          if (i < params.length - 1) {
-            conf.Interval = params[i + 1] * 1;
-            i++;
-          }
-          break;
-        case "-retention":
-          if (i < params.length - 1) {
-            conf.Retention = params[i + 1] * 1;
-            i++;
-          }
-          break;
-      }
-    }
-    if (conf.Interval < 60) {
-      conf.Interval = 600;
-    }
-    if (conf.Retention < 600) {
-      conf.Retention = 3600;
-    }
-    conf.Task = info.Task && env == "windows";
-  }
   const help = () => {
-    window.runtime.BrowserOpenURL("https://zenn.dev/twsnmp/books/twsnmpfc-manual/viewer/sensors");
-  }
+    window.runtime.BrowserOpenURL(
+      "https://zenn.dev/twsnmp/books/twsnmpfc-manual/viewer/sensors"
+    );
+  };
 </script>
 
-<Alert prop={alert} />
-{#if pcapVersion == ""}
-  <fieldset>
-    <legend>TWPCAP</legend>
-    <div class="field-row" id="nopcap">
-      <span>
-        PCAPライブラリをインストールしてください。
-      </span>
-    </div>
-    <div class="field-row">
-      <button on:click={help}>ヘルプ</button>
-    </div>  
-  </fieldset>
-{:else}
-  <fieldset>
-    <legend>パケットキャプチャーセンサー(TWPCAP)</legend>
-    <div class="field-row">
-      <label for="status">状態</label>
-      <input id="status" disabled type="text" value="{info.Running ? '稼働' : '停止'}"/>
-    </div>
-    <div class="field-row">
-      <label for="pcap">PCAP Version:</label>
-      <input id="pcap" disabled type="text" value="{pcapVersion}"/>
-    </div>
-    <div class="field-row">
-      <label for="syslog">syslog送信先:</label>
-      <input
-        id="syslog"
-        type="text"
-        style="width: 80%;"
-        bind:value={conf.Syslog}
-      />
-    </div>
-    <div class="field-row">
-      <label for="iface">LAN I/F:</label>
-      <select id="iface" bind:value={conf.Iface}>
-        {#each ifaces as i}
+<Modal bind:open={show} size="md" autoclose={false} permanent class="w-full">
+  <h3 class="text-xl font-medium text-gray-900 dark:text-white">
+    twpcapの起動
+  </h3>
+  {#if info.PcapVersion}
+    <Alert color="blue" class="h-3">
+      PCAP Version:{info.PcapVersion}
+    </Alert>
+  {:else}
+    <Alert color="red" class="h-3">
+      <i class="fa-solid fa-triangle-exclamation" />
+      PCAPライブラリーをインストールしてください。
+      <Button class="w-2" color="alternative" on:click={help}>
+        <i class="fa-regular fa-circle-question" />
+      </Button>
+    </Alert>
+  {/if}
+  <Label>
+    <span>syslog送信先</span>
+    <Input
+      color={syslogError ? "red" : "base"}
+      bind:value={conf.Syslog}
+      class="mt-1"
+    />
+    <Helper class="mt-2" color={syslogError ? "red" : "gray"}>
+      syslogの送信先をカンマ区切りで指定してください。
+    </Helper>
+  </Label>
+  <Label
+    >LANポート
+    <Select
+      class="mt-1"
+      color={ifaceError ? "red" : "base"}
+      bind:value={conf.Iface}
+      placeholder=""
+    >
+      {#each info.Ifaces as i}
+        {#if i.Value == conf.Iface}
+          <option selected value={i.Value}>{i.Text}</option>
+        {:else}
           <option value={i.Value}>{i.Text}</option>
-        {/each}
-      </select>
-    </div>
-    <div class="field-row">
-      <label for="interval">送信間隔:</label>
-      <input
-        id="interval"
-        type="number"
-        min="60"
-        max="3600"
-        bind:value={conf.Interval}
-      />
-      <label for="interval">秒</label>
-      <label for="retention">保存時間:</label>
-      <input id="retention" type="number" min="600" bind:value={conf.Retention} />
-      <label for="retention">秒</label>
-      {#if env == "windows"}
-        <input type="checkbox" id="twpcap_task" bind:checked={conf.Task} />
-        <label for="twpcap_task">スケジューラー</label>
-      {/if}
-    </div>
-    <div class="field-row">
-      {#if info.Running}
-        <button on:click={stop}>停止</button>
-      {:else}
-        <button on:click={start}>起動</button>
-      {/if}
-    </div>
-  </fieldset>
-{/if}
-<style>
- #nopcap {
-  font-size: 24px;
-  color: darkred;
- } 
-</style>
+        {/if}
+      {/each}
+    </Select>
+    <Helper class="mt-2" color={ifaceError ? "red" : "gray"}>
+      パケットキャプチャーするLANポートを指定してください。
+    </Helper>
+  </Label>
+
+  <div class="flex">
+    <Label>
+      <span>送信周期(秒)</span>
+      <Input type="number" class="w-2 mt-1" bind:value={conf.Interval} />
+    </Label>
+    <Label class="ml-3">
+      <span>保存時間(秒)</span>
+      <Input type="number" class="w-3 mt-1" bind:value={conf.Retention} />
+    </Label>
+    {#if info.Env == "windows"}
+      <Toggle class="ml-3 mt-3" bind:checked={conf.Task}>スケジューラー</Toggle>
+    {/if}
+  </div>
+  {#if info.PcapVersion}
+    <Button on:click={start}>起動</Button>
+  {/if}
+  <Button color="alternative" on:click={cancel}>キャンセル</Button>
+</Modal>

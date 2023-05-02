@@ -1,139 +1,75 @@
 <script>
-  import Alert from "./Alert.svelte";
-  export let env = "";
-  let info = {
-    Params: [],
-    Running: false,
-    Task: false,
+  import { createEventDispatcher } from "svelte";
+  import { Button, Modal, Label, Input, Toggle, Helper } from "flowbite-svelte";
+
+  export let show = false;
+  export let info = {
+    Version: "",
+    Env: "",
+    Ifaces: [],
+    PcapVersion: "",
   };
-  let conf = {
+
+  export let conf = {
     Syslog: "",
     Interval: 600,
-    Retention: 3600,
+    Task: false,
   };
-  let alert = {
-    title: "",
-    message: "",
+
+  let syslogError = false;
+
+  const dispatch = createEventDispatcher();
+
+  const cancel = () => {
+    syslogError = false;
+    dispatch("done", {
+      type: "twWifiScan",
+      start: false,
+    });
   };
-  window.go.main.App.GetProcessInfo("twWifiScan").then((r) => {
-    info = r;
-    setConf(r.Params);
-  });
+
   const start = () => {
     if (!checkParams()) {
       return;
     }
-    let params = [];
-    params.push("-syslog");
-    params.push(conf.Syslog);
-    params.push("-interval");
-    params.push(conf.Interval + "");
-    setAlert(
-      "twWifiScan起動中",
-      "twWifiScanを起動しています。お待ちください。",
-      true
-    );
-    window.go.main.App.Start("twWifiScan", params, conf.Task).then((r) => {
-      if (r === "") {
-        info.Running = true;
-        setAlert("", "", false);
-      } else {
-        setAlert("twWifiScan起動エラー", r, false);
-      }
+    dispatch("done", {
+      type: "twWifiScan",
+      start: true,
+      conf: conf,
     });
-  };
-  const stop = () => {
-    setAlert(
-      "twWifiScan停止中",
-      "twWifiScanを停止しています。お待ちください。",
-      true
-    );
-    window.go.main.App.Stop("twWifiScan").then((r) => {
-      if (r === "") {
-        info.Running = false;
-        setAlert("", "", false);
-      } else {
-        setAlert("twWifiScan停止エラー", r, false);
-      }
-    });
-  };
-  const setAlert = (t, m, w) => {
-    alert.title = t;
-    alert.message = m;
-    alert.wait = w;
   };
   const checkParams = () => {
+    syslogError = false;
     if (!conf.Syslog) {
-      setAlert(
-        "twWifiScanパラメータエラー",
-        "Syslogの送信先を指定してください。",
-        false
-      );
+      syslogError = true;
       return false;
     }
     return true;
   };
-  const setConf = (params) => {
-    for (let i = 0; i < params.length; i++) {
-      switch (params[i]) {
-        case "-syslog":
-          if (i < params.length - 1) {
-            conf.Syslog = params[i + 1];
-            i++;
-          }
-          break;
-        case "-interval":
-          if (i < params.length - 1) {
-            conf.Interval = params[i + 1] * 1;
-            i++;
-          }
-          break;
-      }
-    }
-    if (conf.Interval < 60) {
-      conf.Interval = 600;
-    }
-    conf.Task = info.Task && env == "windows";
-  };
 </script>
 
-<Alert prop={alert} />
-<fieldset>
-  <legend>Wifiアクセスポイントセンサー(twWifiScan)</legend>
-  <div class="field-row">
-    <label for="status">状態</label>
-    <input id="status" disabled type="text" value="{info.Running ? '稼働' : '停止'}"/>
-  </div>
-  <div class="field-row">
-    <label for="syslog">syslog送信先:</label>
-    <input
-      id="syslog"
-      type="text"
-      style="width: 80%;"
+<Modal bind:open={show} size="md" autoclose={false} permanent class="w-full">
+  <h3 class="mb-4 text-xl text-gray-900 dark:text-white">twWifiScanの設定</h3>
+  <Label>
+    <span>syslog送信先</span>
+    <Input
+      color={syslogError ? "red" : "base"}
       bind:value={conf.Syslog}
+      class="mt-1"
     />
-  </div>
-  <div class="field-row">
-    <label for="interval">送信間隔:</label>
-    <input
-      id="interval"
-      type="number"
-      min="60"
-      max="3600"
-      bind:value={conf.Interval}
-    />
-    <label for="interval">秒</label>
-    {#if env == "windows"}
-      <input type="checkbox" id="wifi_task" bind:checked={conf.Task} />
-      <label for="wifi_task">スケジューラー</label>
+    <Helper class="mt-2" color={syslogError ? "red" : "gray"}>
+      syslogの送信先をカンマ区切りで指定してください。
+    </Helper>
+  </Label>
+  <div class="flex">
+    <Label>
+      <span>送信周期(秒)</span>
+      <Input type="number" class="w-3 mt-1" bind:value={conf.Interval} />
+    </Label>
+    {#if info.Env == "windows"}
+      <Toggle class="ml-3 mt-3" bind:checked={conf.Task}>スケジューラー</Toggle>
     {/if}
   </div>
-  <div class="field-row">
-    {#if info.Running}
-      <button on:click={stop}>停止</button>
-    {:else}
-      <button on:click={start}>起動</button>
-    {/if}
-  </div>
-</fieldset>
-
+  <Button on:click={start}>起動</Button>
+  <Button color="alternative" on:click={cancel}>キャンセル</Button>
+</Modal>

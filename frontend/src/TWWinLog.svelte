@@ -1,166 +1,94 @@
 <script>
-  import Alert from "./Alert.svelte";
-  export let env = "";
-  let info = {
-    Params: [],
-    Running: false,
-    Task: false,
+  import { createEventDispatcher } from 'svelte';
+  import { 
+    Button,Modal, Label, Input,Toggle,Helper
+  } from 'flowbite-svelte';
+
+  export let show = false;
+  export let info = {
+    Version: "",
+    Env: "",
+    Ifaces: [],
+    PcapVersion: "",
   };
-  let conf = {
+
+  export let conf = {
     Syslog: "",
     Interval: 600,
     Remote: '',
     User: '',
     Password: '',
+    Task: false,
   };
-  let alert = {
-    title: "",
-    message: "",
-  };
-  window.go.main.App.GetProcessInfo("twWinLog").then((r) => {
-    info = r;
-    setConf(r.Params);
-  });
+
+  let syslogError = false;
+
+  const dispatch = createEventDispatcher();
+
+  const cancel = () => {
+    syslogError = false;
+    dispatch("done",{
+      type: "twWinLog",
+      start: false,
+    });
+  }
+
   const start = () => {
     if (!checkParams()) {
       return;
     }
-    let params = [];
-    params.push("-syslog");
-    params.push(conf.Syslog);
-    params.push("-interval");
-    params.push(conf.Interval + "");
-    if( conf.Remote) {
-      params.push("-remote");
-      params.push(conf.Remote);
-      params.push("-user");
-      params.push(conf.User);
-      params.push("-password");
-      params.push(conf.Passowd);
-    }
-    setAlert("twWinLog起動中", "twWinLogを起動しています。お待ちください。", true);
-    window.go.main.App.Start("twWinLog", params,conf.Task).then((r) => {
-      if (r === "") {
-        info.Running = true;
-        setAlert("", "", false);
-      } else {
-        setAlert("twWinLog起動エラー", r, false);
-      }
+    dispatch("done",{
+      type: "twWinLog",
+      start: true,
+      conf: conf,
     });
-  };
-  const stop = () => {
-    setAlert("twWinLog停止中", "twWinLogを停止しています。お待ちください。", true);
-    window.go.main.App.Stop("twWinLog").then((r) => {
-      if (r === "") {
-        info.Running = false;
-        setAlert("", "", false);
-      } else {
-        setAlert("twWinLog停止エラー", r, false);
-      }
-    });
-  };
-  const setAlert = (t, m, w) => {
-    alert.title = t;
-    alert.message = m;
-    alert.wait = w;
   };
   const checkParams = () => {
+    syslogError = false;
     if (!conf.Syslog) {
-      setAlert(
-        "twWinLogパラメータエラー",
-        "Syslogの送信先を指定してください。",
-        false
-      );
+      syslogError = true;
       return false;
     }
     return true;
   };
-  const setConf = (params) => {
-    for (let i = 0; i < params.length; i++) {
-      switch (params[i]) {
-        case "-syslog":
-          if (i < params.length - 1) {
-            conf.Syslog = params[i + 1];
-            i++;
-          }
-          break;
-        case "-interval":
-          if (i < params.length - 1) {
-            conf.Interval = params[i + 1] * 1;
-            i++;
-          }
-          break;
-        case "-remote":
-          if (i < params.length - 1) {
-            conf.Remote = params[i + 1];
-            i++;
-          }
-          break;
-        case "-user":
-          if (i < params.length - 1) {
-            conf.User = params[i + 1];
-            i++;
-          }
-        case "-password":
-          if (i < params.length - 1) {
-            conf.Password = params[i + 1];
-            i++;
-          }
-          break;
-      }
-    }
-    conf.Task = info.Task && env == "windows";
-  };
 </script>
 
-<Alert prop={alert} />
-<fieldset>
-  <legend>Windowsイベントログセンサー(twWinLog)</legend>
-  <div class="field-row">
-    <label for="status">状態</label>
-    <input id="status" disabled type="text" value="{info.Running ? '稼働' : '停止'}"/>
-  </div>
-  <div class="field-row">
-    <label for="syslog">syslog送信先:</label>
-    <input
-      id="syslog"
-      type="text"
-      style="width: 80%;"
+<Modal bind:open={show} size="md" autoclose={false} permanent class="w-full">
+  <h3 class="text-xl text-gray-900 dark:text-white">twWifiScanの設定</h3>
+  <Label>
+    <span>syslog送信先</span>
+    <Input
+      color={syslogError ? "red" : "base"}
       bind:value={conf.Syslog}
+      class="mt-1"
     />
+    <Helper class="mt-2" color={syslogError ? "red" : "gray"}>
+      syslogの送信先をカンマ区切りで指定してください。
+    </Helper>
+  </Label>
+  <Label>
+    <span>リモート</span>
+    <Input class ="mt-1" bind:value={conf.Remote} />
+  </Label>
+  <div class="flex">
+    <Label>
+      <span>ユーザー</span>
+      <Input class="mt-1" bind:value={conf.User}/>
+    </Label>
+    <Label class="ml-3">
+      <span>パスワード</span>
+      <Input type="password" bind:value={conf.Password}/>
+    </Label>
   </div>
-  <div class="field-row">
-    <label for="remote">リモート:</label>
-    <input id="remote" type="text" bind:value={conf.Remote} />
-  </div>
-  {#if info.Remote}
-    <div class="field-row">
-      <label for="user">ユーザー:</label>
-      <input id="user" type="text" bind:value={conf.User} />
-      <label for="password">パスワード:</label>
-      <input id="password" type="password" bind:value={conf.Password} />
-    </div>
-  {/if}
-  <div class="field-row">
-    <label for="interval">送信間隔:</label>
-    <input
-      id="interval"
-      type="number"
-      min="60"
-      max="3600"
-      bind:value={conf.Interval}
-    />
-    <label for="interval">秒</label>
-    {#if env == "windows"}
-      <input type="checkbox" id="winlog_task" bind:checked={conf.Task} />
-      <label for="winlog_task">スケジューラー</label>
+  <div class="flex">
+    <Label>
+      <span>送信周期(秒)</span>
+      <Input type="number" class="w-3 mt-1" bind:value={conf.Interval}/>
+    </Label>
+    {#if info.Env =="windows"}
+      <Toggle class="ml-3 mt-3" bind:checked={conf.Task} >スケジューラー</Toggle>
     {/if}
   </div>
-  <div class="field-row">
-    {#if info.Running}
-      <button on:click={stop}>停止</button>
-    {:else}
-      <button on:click={start}>起動</button>
-    {/if}
-  </div>
-</fieldset>
+  <Button on:click={start}>起動</Button>
+  <Button color="alternative" on:click={cancel}>キャンセル</Button>
+</Modal>
