@@ -64,12 +64,6 @@ func (b *App) checkUrl(url string) bool {
 	return res.StatusCode < 400
 }
 
-func (b *App) DeleteProcess(name string) string {
-	wails.LogDebug(b.ctx, fmt.Sprintf("DeleteProcess name=%s", name))
-	delete(b.processMap, name)
-	return ""
-}
-
 // Start : プロセスを起動する
 func (b *App) Start(name string, params []string, task bool) string {
 	wails.LogDebug(b.ctx, fmt.Sprintf("Start name=%s,params=%v", name, params))
@@ -197,11 +191,13 @@ func (b *App) Stop(name string) string {
 
 // Delete: プロセスを削除する
 func (b *App) Delete(name string) string {
-	if p := b.findProcess(name); p != nil {
-		return "稼働中です。"
+	if !strings.HasPrefix(name, "http") {
+		if p := b.findProcess(name); p != nil {
+			return "稼働中です。"
+		}
 	}
 	delete(b.processMap, name)
-	wails.LogDebugf(b.ctx, "Stop name=%v process not found", name)
+	wails.LogDebugf(b.ctx, "Delete name=%v", name)
 	return ""
 }
 

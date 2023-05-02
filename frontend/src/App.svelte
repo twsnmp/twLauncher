@@ -12,12 +12,14 @@
   import TWPCAP from "./TWPCAP.svelte";
   import TWWifiScan from "./TWWifiScan.svelte";
   import TWWinLog from "./TWWinLog.svelte";
+  import URL from "./URL.svelte";
   import {
     GetInfo,
     GetProcessInfoList,
     Start,
     Stop,
     Delete,
+    Save,
   } from "../wailsjs/go/main/App";
   import {BrowserOpenURL} from "../wailsjs/runtime/runtime";
   import {
@@ -51,6 +53,8 @@
   let twWifiScanConf = {};
   let twWinLogModal = false;
   let twWinLogConf = {};
+  let urlModal = false;
+  let remoteTwsnmpfcUrl = "";
 
   let info = {
     Version: "",
@@ -182,8 +186,23 @@
           );
         }
         break;
+      case "url":
+        urlModal = false;
+        if (e.detail.url) {
+          saveUrl(e.detail.url)
+        }
+        break;
     }
   };
+
+  // URLを保存する
+  const saveUrl = async (url)  => {
+    if (oldName != "") {
+      await Delete(oldName);
+    }
+    await Save(url);
+    updateProcessList();
+  }
 
   const showTwsnmpfcModal = (name, params, task) => {
     if (name == "") {
@@ -252,6 +271,14 @@
     twWinLogModal = true;
   };
 
+  const showUrlModal = (url) => {
+    remoteTwsnmpfcUrl = url;
+    if (url != "") {
+      oldName = url;
+    }
+    urlModal = true;
+  }
+
   // ブラウザーでTWSNMP FCのURLを開く
   const open = (name,params) => {
     if (name.startsWith("http")) {
@@ -313,25 +340,36 @@
         </TableBodyCell>
         <TableBodyCell>{p.Name}</TableBodyCell>
         <TableBodyCell>
-          {#if p.Running}
+          {#if p.Name.startsWith("http") }
             <Button
-              class="w-2"
-              color="red"
-              on:click={() => {
-                stopProcess(p.Name);
-              }}
-            >
-              <i class="fa-solid fa-stop" />
-            </Button>
-          {:else}
-            <Button
-              class="w-2"
-              on:click={() => {
-                showModal(p.Name, p.Params, p.Task);
-              }}
-            >
-              <i class="fa-solid fa-play" />
-            </Button>
+            class="w-2"
+            on:click={() => {
+              showUrlModal(p.Name);
+            }}
+          >
+            <i class="fa-solid fa-pencil"></i>
+          </Button>
+        {:else}
+            {#if p.Running}
+              <Button
+                class="w-2"
+                color="red"
+                on:click={() => {
+                  stopProcess(p.Name);
+                }}
+              >
+                <i class="fa-solid fa-stop" />
+              </Button>
+            {:else}
+              <Button
+                class="w-2"
+                on:click={() => {
+                  showModal(p.Name, p.Params, p.Task);
+                }}
+              >
+                <i class="fa-solid fa-play" />
+              </Button>
+            {/if}
           {/if}
         </TableBodyCell>
         <TableBodyCell>
@@ -348,7 +386,7 @@
           {/if}
         </TableBodyCell>
         <TableBodyCell>
-          {#if !p.Running}
+          {#if !p.Running || p.Name.startsWith("http")}
             <Button
               class="w-2"
               color="red"
@@ -389,6 +427,12 @@
   >
     <i class="fa-brands fa-windows" />
   </SpeedDialButton>
+  <SpeedDialButton
+    name="URL"
+    on:click={() => showUrlModal("")}
+  >
+    <i class="fa-brands fa-chrome" />
+  </SpeedDialButton>
 </SpeedDial>
 
 <Footer class="absolute bottom-0 left-0 z-20 w-full">
@@ -412,6 +456,12 @@
   {info}
   conf={twWinLogConf}
   show={twWinLogModal}
+  on:done={handleDone}
+/>
+
+<URL
+  url={remoteTwsnmpfcUrl}
+  show={urlModal}
   on:done={handleDone}
 />
 
