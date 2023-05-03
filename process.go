@@ -67,6 +67,7 @@ func (b *App) checkUrl(url string) bool {
 // Start : プロセスを起動する
 func (b *App) Start(name string, params []string, task bool) string {
 	wails.LogDebug(b.ctx, fmt.Sprintf("Start name=%s,params=%v", name, params))
+	b.processMap[name] = params
 	if task {
 		if err := b.endTask(name); err != nil {
 			wails.LogError(b.ctx, fmt.Sprintf("end task name=%v err=%v", name, err))
@@ -82,7 +83,6 @@ func (b *App) Start(name string, params []string, task bool) string {
 			wails.LogError(b.ctx, fmt.Sprintf("run task name=%v err=%v", name, err))
 			return fmt.Sprintf("タスクを起動できません:%v", err)
 		}
-		b.processMap[name] = params
 		return ""
 	}
 	if p := b.findProcess(name); p != nil {
@@ -97,7 +97,6 @@ func (b *App) Start(name string, params []string, task bool) string {
 	if cmd.Process != nil {
 		go cmd.Process.Wait()
 	}
-	b.processMap[name] = params
 	return ""
 }
 

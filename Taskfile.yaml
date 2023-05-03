@@ -15,13 +15,13 @@ tasks:
       - wails dev
   mac:
     cmds:
-      - wails build  -platform darwin/universal -clean -ldflags "-s -w -X main.version={{.VERSION}} -X main.commit={{.COMMIT}}"
+      - wails build  -platform darwin/universal -ldflags "-s -w -X main.version={{.VERSION}} -X main.commit={{.COMMIT}}"
   windows:
     cmds:
-      - wails build  -platform windows/amd64 -clean -ldflags "-s -w -X main.version={{.VERSION}} -X main.commit={{.COMMIT}}"
+      - wails build  -platform windows/amd64 -ldflags "-s -w -X main.version={{.VERSION}} -X main.commit={{.COMMIT}}"
   windebug:
     cmds:
-      - wails build  -platform windows/amd64 -debug -clean
+      - wails build  -platform windows/amd64 -debug -clean -windowsconsole -ldflags "-s -w -X main.version={{.VERSION}} -X main.commit={{.COMMIT}}"
   clean:
     cmds:
       - rm -rf build/bin/twLauncher*

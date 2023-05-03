@@ -68,7 +68,7 @@
 
 <Modal bind:open={show} size="md" autoclose={false} class="w-full">
   <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">
-    TWSNMP FC起動
+    TWSNMP FCの起動
   </h3>
   <Label>
     <span>データストア</span>

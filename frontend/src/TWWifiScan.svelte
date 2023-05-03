@@ -49,7 +49,7 @@
 </script>
 
 <Modal bind:open={show} size="md" autoclose={false} permanent class="w-full">
-  <h3 class="mb-4 text-xl text-gray-900 dark:text-white">twWifiScanの設定</h3>
+  <h3 class="text-xl text-gray-900 dark:text-white">TWWifiScanの起動</h3>
   <Label>
     <span>syslog送信先</span>
     <Input

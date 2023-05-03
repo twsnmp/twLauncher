@@ -21,7 +21,7 @@ build/bin/twLauncher.app/Contents/MacOS/twLauncher:
 	wails build  -platform darwin -ldflags $(LDFLAGS)
 
 windebug:
-	wails build  -platform windows -debug -clean
+	wails build  -platform windows/amd64 -debug -clean -windowsconsole
 
 dev:
 	 wails dev -e go,svelte

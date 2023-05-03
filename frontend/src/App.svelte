@@ -421,12 +421,14 @@
   >
     <i class="fa-solid fa-wifi" />
   </SpeedDialButton>
-  <SpeedDialButton
-    name="WinLog"
-    on:click={() => showTwWinLogModal("", [], false)}
-  >
-    <i class="fa-brands fa-windows" />
-  </SpeedDialButton>
+  {#if info.Env.startsWith("win")}
+    <SpeedDialButton
+      name="WinLog"
+      on:click={() => showTwWinLogModal("", [], false)}
+    >
+      <i class="fa-brands fa-windows" />
+    </SpeedDialButton>
+  {/if}
   <SpeedDialButton
     name="URL"
     on:click={() => showUrlModal("")}

@@ -76,11 +76,11 @@
     twpcapの起動
   </h3>
   {#if info.PcapVersion}
-    <Alert color="blue" class="h-3">
+    <Alert color="blue">
       PCAP Version:{info.PcapVersion}
     </Alert>
   {:else}
-    <Alert color="red" class="h-3">
+    <Alert color="red">
       <i class="fa-solid fa-triangle-exclamation" />
       PCAPライブラリーをインストールしてください。
       <Button class="w-2" color="alternative" on:click={help}>

@@ -54,7 +54,7 @@
 </script>
 
 <Modal bind:open={show} size="md" autoclose={false} permanent class="w-full">
-  <h3 class="text-xl text-gray-900 dark:text-white">twWifiScanの設定</h3>
+  <h3 class="text-xl text-gray-900 dark:text-white">TWWinLogの起動</h3>
   <Label>
     <span>syslog送信先</span>
     <Input
@@ -70,16 +70,18 @@
     <span>リモート</span>
     <Input class ="mt-1" bind:value={conf.Remote} />
   </Label>
-  <div class="flex">
-    <Label>
-      <span>ユーザー</span>
-      <Input class="mt-1" bind:value={conf.User}/>
-    </Label>
-    <Label class="ml-3">
-      <span>パスワード</span>
-      <Input type="password" bind:value={conf.Password}/>
-    </Label>
-  </div>
+  {#if conf.Remote}
+    <div class="flex">
+      <Label>
+        <span>ユーザー</span>
+        <Input class="mt-1" bind:value={conf.User}/>
+      </Label>
+      <Label class="ml-3">
+        <span>パスワード</span>
+        <Input type="password" bind:value={conf.Password}/>
+      </Label>
+    </div>
+  {/if}
   <div class="flex">
     <Label>
       <span>送信周期(秒)</span>
