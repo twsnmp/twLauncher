@@ -77,6 +77,15 @@
   const updateProcessList = async () => {
     const r = await GetProcessInfoList();
     proceses = r || [];
+    proceses.sort((a,b)=> {
+      if (a.Name < b.Name) {
+        return -1;
+      }
+      if (a.Name > b.Name) {
+        return 1;
+      }
+      return 0;
+    });
   };
 
   const startProcess = async (name, params, task) => {
