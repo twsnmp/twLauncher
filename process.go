@@ -36,7 +36,7 @@ func (b *App) GetProcessInfoList() []ProcessInfo {
 			running = b.checkUrl(name)
 		} else {
 			running = b.findProcess(name) != nil
-			task = b.findTask(name) != nil
+			task = b.findTask(name) == nil
 		}
 		ret = append(ret, ProcessInfo{
 			Name:    name,
@@ -204,23 +204,27 @@ func (b *App) Delete(name string) string {
 func (b *App) findProcess(name string) *process.Process {
 	params, ok := b.processMap[name]
 	if !ok {
+		wails.LogError(b.ctx, fmt.Sprintf("processMap not found name=%v", name))
 		return nil
 	}
 	a := strings.SplitN(name, ":", 2)
 	if len(a) == 2 {
 		name = a[0]
 	}
+	name = strings.ToLower(name)
 	list, err := process.Processes()
 	if err != nil {
 		wails.LogError(b.ctx, fmt.Sprintf("find process list name=%v err=%v", name, err))
 		return nil
 	}
 	for _, p := range list {
-		if n, err := p.Name(); err != nil || !strings.HasPrefix(n, name) {
+		if n, err := p.Name(); err != nil || !strings.HasPrefix(strings.ToLower(n), name) {
 			continue
 		}
-		if cls, err := p.CmdlineSlice(); err == nil && len(cls) > 1 && cmpArgs(params, cls[1:]) {
+		if cls, err := p.CmdlineSlice(); err == nil && len(cls) > 1 && cmpArgs(params, cls) {
 			return p
+		} else {
+			wails.LogErrorf(b.ctx, "cmpArgs name=%s err=%v params=%v cls=%v", name, err, params, cls)
 		}
 	}
 	wails.LogError(b.ctx, fmt.Sprintf("process not found name=%v", name))
@@ -228,11 +232,22 @@ func (b *App) findProcess(name string) *process.Process {
 }
 
 func cmpArgs(s, p []string) bool {
-	if len(s) != len(p) {
+	o := 0
+	if len(s) > len(p) || len(s) < 1 {
+		return false
+	}
+	for o = range p {
+		pa := strings.ReplaceAll(p[o], "\"", "")
+		if s[0] == pa {
+			break
+		}
+	}
+	if len(s) != len(p)-o {
 		return false
 	}
 	for i := range s {
-		if s[i] != p[i] {
+		pa := strings.ReplaceAll(p[i+o], "\"", "")
+		if s[i] != pa {
 			return false
 		}
 	}

@@ -15,7 +15,8 @@ func (b *App) findTask(name string) error {
 	if runtime.GOOS != "windows" {
 		return fmt.Errorf("not windows")
 	}
-	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/Query", "/TN", "\\TWSNMP\\" + name, "/XML"})
+	tn := strings.ReplaceAll("\\TWSNMP\\"+name, ":", "_")
+	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/Query", "/TN", tn, "/XML"})
 	return cmd.Run()
 }
 
@@ -24,7 +25,7 @@ func (b *App) createTask(name string, params []string) error {
 	if runtime.GOOS != "windows" {
 		return fmt.Errorf("not windows")
 	}
-	tn := "\\TWSNMP\\" + name
+	tn := strings.ReplaceAll("\\TWSNMP\\"+name, ":", "_")
 	// 仮のタスクを登録
 	cmd := getCmd(b.ctx, "schtasks.exe",
 		[]string{"/Create",
@@ -108,7 +109,8 @@ func (b *App) deleteTask(name string) error {
 	if runtime.GOOS != "windows" {
 		return fmt.Errorf("not windows")
 	}
-	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/Delete", "/TN", "\\TWSNMP\\" + name, "/F"})
+	tn := strings.ReplaceAll("\\TWSNMP\\"+name, ":", "_")
+	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/Delete", "/TN", tn, "/F"})
 	o, err := cmd.CombinedOutput()
 	if err != nil {
 		wails.LogError(b.ctx, fmt.Sprintf("delete task out=%s err=%v", strings.TrimSpace(string(o)), err))
@@ -123,7 +125,8 @@ func (b *App) runTask(name string) error {
 	if runtime.GOOS != "windows" {
 		return fmt.Errorf("not windows")
 	}
-	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/Run", "/TN", "\\TWSNMP\\" + name, "/I"})
+	tn := strings.ReplaceAll("\\TWSNMP\\"+name, ":", "_")
+	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/Run", "/TN", tn, "/I"})
 	o, err := cmd.CombinedOutput()
 	if err != nil {
 		wails.LogError(b.ctx, fmt.Sprintf("run task out=%s err=%v", strings.TrimSpace(string(o)), err))
@@ -137,7 +140,8 @@ func (b *App) endTask(name string) error {
 	if runtime.GOOS != "windows" {
 		return fmt.Errorf("not windows")
 	}
-	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/End", "/TN", "\\TWSNMP\\" + name})
+	tn := strings.ReplaceAll("\\TWSNMP\\"+name, ":", "_")
+	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/End", "/TN", tn})
 	o, err := cmd.CombinedOutput()
 	if err != nil {
 		wails.LogError(b.ctx, fmt.Sprintf("end task out=%s err=%v", strings.TrimSpace(string(o)), err))
