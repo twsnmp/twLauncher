@@ -89,6 +89,7 @@
   };
 
   const startProcess = async (name, params, task) => {
+    errorMsg = "";
     infoMsg = name + "を起動しています。お待ち下さい。";
     waitModal = true;
     if (oldName) {
@@ -106,6 +107,7 @@
   };
 
   const stopProcess = async (name) => {
+    errorMsg = "";
     infoMsg = name + "を停止しています。お待ち下さい。";
     waitModal = true;
     const r = await Stop(name);
@@ -119,6 +121,7 @@
   };
 
   const deleteProcess = async (name) => {
+    errorMsg = "";
     infoMsg = name + "を削除しています。お待ち下さい。";
     waitModal = true;
     const r = await Delete(name);
@@ -476,19 +479,18 @@
   on:done={handleDone}
 />
 
-<Modal bind:open={waitModal} size="xs" autoclose={false}>
+<Modal bind:open={waitModal} size="xs" autoclose={false} permanent>
   {#if infoMsg != ""}
   <Alert>
     <i class="fa-solid fa-circle-info" />
     {infoMsg}
   </Alert>
-{/if}
-{#if errorMsg != ""}
-  <Alert color="red">
-    <i class="fa-solid fa-triangle-exclamation" />
-    {errorMsg}
-  </Alert>
-  <Button color="alternative" on:click={()=>{waitModal=false;errorMsg="";}}>閉じる</Button>
-{/if}
-
+  {/if}
+  {#if errorMsg != ""}
+    <Alert color="red">
+      <i class="fa-solid fa-triangle-exclamation" />
+      {errorMsg}
+    </Alert>
+    <Button color="alternative" on:click={()=>{waitModal=false;errorMsg="";}}>閉じる</Button>
+  {/if}
 </Modal>
