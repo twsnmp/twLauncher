@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"runtime"
 	"strings"
@@ -67,7 +66,7 @@ func (b *App) createTask(name string, params []string) error {
 	} else {
 		xml = strings.Replace(xml, " <Settings>", " <Settings>\n<Hidden>true</Hidden>", 1)
 	}
-	fp, err := ioutil.TempFile("", "twlauncher")
+	fp, err := os.CreateTemp("", "twlauncher")
 	if err != nil {
 		return err
 	}

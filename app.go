@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"runtime"
@@ -127,7 +126,7 @@ func (b *App) loadConfig() error {
 	if err != nil {
 		return err
 	}
-	j, err := ioutil.ReadFile(conf)
+	j, err := os.ReadFile(conf)
 	if err != nil {
 		return err
 	}
@@ -146,7 +145,7 @@ func (b *App) saveConfig() error {
 		return err
 	}
 	wails.LogDebug(b.ctx, string(j))
-	ioutil.WriteFile(conf, j, 0600)
+	os.WriteFile(conf, j, 0600)
 	return nil
 }
 
