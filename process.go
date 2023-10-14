@@ -144,21 +144,20 @@ func (b *App) Stop(name string) string {
 			}
 			if err := b.endTask(name); err != nil {
 				wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
+				return fmt.Sprintf("タスクを停止できません:%v", err)
 			}
 			if err := b.deleteTask(name); err != nil {
 				wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
-				return fmt.Sprintf("タスク削除エラー:%v", err)
+				return fmt.Sprintf("タスクを削除できません:%v", err)
+			}
+			if p := b.findProcess(name); p != nil {
+				wails.LogError(b.ctx, fmt.Sprintf("kill name=%v", name))
+				p.Kill()
 			}
 			return ""
 		}
 	}
 	if p := b.findProcess(name); p != nil {
-		if err := p.SendSignal(syscall.SIGINT); err != nil {
-			wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
-		}
-		if err := p.SendSignal(syscall.SIGTERM); err != nil {
-			wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
-		}
 		if runtime.GOOS == "windows" {
 			if strings.HasPrefix(name, "twsnmpfc") {
 				for i := 0; i < 15; i++ {
@@ -173,16 +172,24 @@ func (b *App) Stop(name string) string {
 				p.Kill()
 				return ""
 			}
-		}
-		for i := 0; i < 5; i++ {
-			time.Sleep(time.Second * 2)
-			p := b.findProcess(name)
-			if p == nil {
-				return ""
+		} else {
+			if err := p.SendSignal(syscall.SIGINT); err != nil {
+				wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
 			}
+			if err := p.SendSignal(syscall.SIGTERM); err != nil {
+				wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
+			}
+			for i := 0; i < 5; i++ {
+				time.Sleep(time.Second * 2)
+				p := b.findProcess(name)
+				if p == nil {
+					return ""
+				}
+			}
+			wails.LogError(b.ctx, fmt.Sprintf("kill name=%v", name))
+			p.Kill()
+			return "強制終了しました"
 		}
-		p.Kill()
-		return "強制終了しました"
 	}
 	wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v process not found", name))
 	return ""
@@ -202,14 +209,17 @@ func (b *App) Delete(name string) string {
 
 // findProcess : 起動中のプロセスを探す
 func (b *App) findProcess(name string) *process.Process {
-	params, ok := b.processMap[name]
+	_, ok := b.processMap[name]
 	if !ok {
 		wails.LogError(b.ctx, fmt.Sprintf("processMap not found name=%v", name))
 		return nil
 	}
+	oname := name
 	a := strings.SplitN(name, ":", 2)
+	cp := ""
 	if len(a) == 2 {
 		name = a[0]
+		cp = strings.TrimSpace(a[1])
 	}
 	name = strings.ToLower(name)
 	list, err := process.Processes()
@@ -221,37 +231,37 @@ func (b *App) findProcess(name string) *process.Process {
 		if n, err := p.Name(); err != nil || !strings.HasPrefix(strings.ToLower(n), name) {
 			continue
 		}
-		if cls, err := p.CmdlineSlice(); err == nil && len(cls) > 1 && cmpArgs(params, cls) {
+		if cls, err := p.CmdlineSlice(); err == nil && checkParam(name, cp, cls) {
 			return p
 		} else {
-			wails.LogErrorf(b.ctx, "cmpArgs name=%s err=%v params=%v cls=%v", name, err, params, cls)
+			wails.LogErrorf(b.ctx, "checkParam name=%s err=%v cp='%s' cls=%v", name, err, cp, cls)
 		}
 	}
-	wails.LogError(b.ctx, fmt.Sprintf("process not found name=%v", name))
+	wails.LogError(b.ctx, fmt.Sprintf("process not found name=%v", oname))
 	return nil
 }
 
-func cmpArgs(s, p []string) bool {
-	o := 0
-	if len(s) > len(p) || len(s) < 1 {
-		return false
+func checkParam(name, cp string, p []string) bool {
+	if name == "twwinlog" && cp == "" {
+		for _, v := range p {
+			if v == "-remote" {
+				return false
+			}
+		}
+		return true
 	}
-	for o = range p {
-		pa := strings.ReplaceAll(p[o], "\"", "")
-		if s[0] == pa {
-			break
+	for i, v := range p {
+		if i+1 < len(p) {
+			switch v {
+			case "-port", "-remote", "-iface":
+				s := strings.ReplaceAll(p[i+1], "\"", "")
+				if s == cp {
+					return true
+				}
+			}
 		}
 	}
-	if len(s) != len(p)-o {
-		return false
-	}
-	for i := range s {
-		pa := strings.ReplaceAll(p[i+o], "\"", "")
-		if s[i] != pa {
-			return false
-		}
-	}
-	return true
+	return false
 }
 
 func (b *App) stopByUdp(pid int) {

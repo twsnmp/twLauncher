@@ -29,7 +29,6 @@ func NewApp() *App {
 
 // startup is called at application startup
 func (b *App) startup(ctx context.Context) {
-	// Perform your setup here
 	b.ctx = ctx
 	wails.LogDebug(b.ctx, "startup")
 	if err := b.loadConfig(); err != nil {
@@ -39,7 +38,6 @@ func (b *App) startup(ctx context.Context) {
 
 // shutdown is called at application termination
 func (b *App) shutdown(ctx context.Context) {
-	// Perform your teardown here
 	wails.LogDebug(b.ctx, "shutdown")
 	if err := b.saveConfig(); err != nil {
 		wails.LogError(b.ctx, fmt.Sprintf("save config err=%v", err))
