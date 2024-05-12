@@ -1,6 +1,6 @@
 .PHONY: all clean windows mac windebug wininstaller dev
 ### バージョンの定義
-VERSION     := "v1.36.3"
+VERSION     := "v1.36.4"
 COMMIT      := $(shell git rev-parse --short HEAD)
 
 ### コマンドの定義
