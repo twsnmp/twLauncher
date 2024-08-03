@@ -20,6 +20,7 @@
     Stop,
     Delete,
     Save,
+    NeedWindowsPrivilege,
   } from "../wailsjs/go/main/App";
   import {BrowserOpenURL} from "../wailsjs/runtime/runtime";
   import {
@@ -40,6 +41,7 @@
     SpeedDialButton,
     Alert,
     Modal,
+    Badge,
   } from "flowbite-svelte";
 
   let infoMsg = "";
@@ -55,6 +57,7 @@
   let twWinLogConf = {};
   let urlModal = false;
   let remoteTwsnmpfcUrl = "";
+  let needPriv = false;
 
   let info = {
     Version: "",
@@ -72,6 +75,7 @@
       info = r;
     }
     updateProcessList();
+    needPriv = await NeedWindowsPrivilege();
   });
 
   const updateProcessList = async () => {
@@ -311,9 +315,12 @@
     >
       TWSNMP FC 起動ツール
     </span>
-    <span class="text-sm dark:text-white ml-2">
+    <span class="text-sm dark:text-white ml-2 mr-2">
       {info.Version}
     </span>
+    {#if needPriv}
+      <Badge large color="red">管理者権限なし</Badge>
+    {/if}
   </NavBrand>
   <div class="flex">
     <DarkMode />

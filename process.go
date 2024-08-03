@@ -278,3 +278,24 @@ func (b *App) stopByUdp(pid int) {
 		}()
 	}
 }
+
+func (b *App) NeedWindowsPrivilege() bool {
+	if runtime.GOOS != "windows" {
+		return false
+	}
+	if list, err := process.Processes(); err == nil {
+		for _, p := range list {
+			if _, err := p.Name(); err != nil && strings.Contains(err.Error(), "Access is denied.") {
+				//  Access is denied.で名前の取得できないプロセスがあるのは、権限がないため
+				wails.LogError(b.ctx, fmt.Sprintf("NeedWinPrivilege err=%v", err))
+				return true
+			}
+		}
+	} else {
+		if strings.Contains(err.Error(), "Access is denied.") {
+			wails.LogError(b.ctx, fmt.Sprintf("NeedWinPrivilege err=%v", err))
+			return true
+		}
+	}
+	return false
+}
