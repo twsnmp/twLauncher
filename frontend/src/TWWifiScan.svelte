@@ -66,7 +66,7 @@
       <span>送信周期(秒)</span>
       <Input type="number" class="w-3 mt-1" bind:value={conf.Interval} />
     </Label>
-    {#if info.Env == "windows"}
+    {#if info.Env == "windows" && !info.NeedPriv}
       <Toggle class="ml-3 mt-3" bind:checked={conf.Task}>スケジューラー</Toggle>
     {/if}
   </div>

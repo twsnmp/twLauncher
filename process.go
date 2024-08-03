@@ -279,7 +279,7 @@ func (b *App) stopByUdp(pid int) {
 	}
 }
 
-func (b *App) NeedWindowsPrivilege() bool {
+func (b *App) needWindowsPrivilege() bool {
 	if runtime.GOOS != "windows" {
 		return false
 	}

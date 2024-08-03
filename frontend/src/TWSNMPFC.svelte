@@ -97,7 +97,7 @@
     {#if !conf.Local}
       <Toggle class="ml-3 mt-3" bind:checked={conf.TLS}>TLS(HTTPS)</Toggle>
     {/if}
-    {#if info.Env == "windows"}
+    {#if info.Env == "windows" && !info.NeedPriv}
       <Toggle class="ml-3 mt-3" bind:checked={conf.Task}>スケジューラー</Toggle>
     {/if}
   </div>

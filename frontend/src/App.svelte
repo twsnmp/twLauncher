@@ -20,7 +20,6 @@
     Stop,
     Delete,
     Save,
-    NeedWindowsPrivilege,
   } from "../wailsjs/go/main/App";
   import {BrowserOpenURL} from "../wailsjs/runtime/runtime";
   import {
@@ -57,11 +56,11 @@
   let twWinLogConf = {};
   let urlModal = false;
   let remoteTwsnmpfcUrl = "";
-  let needPriv = false;
 
   let info = {
     Version: "",
     Env: "",
+    NeedPriv: false,
     Ifaces: [],
     PcapVersion: "",
   };
@@ -75,7 +74,6 @@
       info = r;
     }
     updateProcessList();
-    needPriv = await NeedWindowsPrivilege();
   });
 
   const updateProcessList = async () => {
@@ -318,7 +316,7 @@
     <span class="text-sm dark:text-white ml-2 mr-2">
       {info.Version}
     </span>
-    {#if needPriv}
+    {#if info.NeedPriv}
       <Badge large color="red">管理者権限なし</Badge>
     {/if}
   </NavBrand>

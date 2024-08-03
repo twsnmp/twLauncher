@@ -66,9 +66,12 @@ type selectDataEnt struct {
 type LanuncherInfo struct {
 	Version     string
 	Env         string
+	NeedPriv    bool
 	Ifaces      []selectDataEnt
 	PcapVersion string
 }
+
+var npriv = false
 
 // GetInfo : ランチャー情報の取得
 func (b *App) GetInfo() LanuncherInfo {
@@ -80,11 +83,15 @@ func (b *App) GetInfo() LanuncherInfo {
 			}
 		}
 	}
+	if !npriv {
+		npriv = b.needWindowsPrivilege()
+	}
 	return LanuncherInfo{
 		Version:     fmt.Sprintf("%s(%s)", version, commit),
 		Env:         env,
 		Ifaces:      b.getIfaces(),
 		PcapVersion: b.pcapVersion(),
+		NeedPriv:    npriv,
 	}
 }
 
