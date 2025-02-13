@@ -34,7 +34,7 @@ func (b *App) createTask(name string, params []string) error {
 			"/TR", "'" + b.getExec(name) + "'" + makeArg(params)})
 	err := cmd.Run()
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("create task err=%v", err))
+		wails.LogErrorf(b.ctx, "create task err=%v", err)
 		return err
 	}
 	// 作成したタスクのXMLで取得する
@@ -45,7 +45,7 @@ func (b *App) createTask(name string, params []string) error {
 		})
 	o, err := cmd.CombinedOutput()
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("query task out=%s err=%v", strings.TrimSpace(string(o)), err))
+		wails.LogErrorf(b.ctx, "query task out=%s err=%v", strings.TrimSpace(string(o)), err)
 		return err
 	}
 	// タスクを削除する
@@ -56,7 +56,7 @@ func (b *App) createTask(name string, params []string) error {
 		})
 	err = cmd.Run()
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("delete task err=%v", err))
+		wails.LogErrorf(b.ctx, "delete task err=%v", err)
 		return err
 	}
 	// 仮タスクのXMLを書き換える
@@ -74,7 +74,7 @@ func (b *App) createTask(name string, params []string) error {
 	tmpName := fp.Name()
 	_, err = fp.WriteString(xml)
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("create task write err=%v", err))
+		wails.LogErrorf(b.ctx, "create task write err=%v", err)
 		return err
 	}
 	fp.Close()
@@ -82,7 +82,7 @@ func (b *App) createTask(name string, params []string) error {
 	cmd = getCmd(b.ctx, "schtasks.exe", []string{"/Create", "/TN", tn, "/XML", tmpName})
 	err = cmd.Run()
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("create task from xml err=%v", err))
+		wails.LogErrorf(b.ctx, "create task from xml err=%v", err)
 		return err
 	}
 	// 作成したタスクのXMLを確認したい時は以下をコメントアウト
@@ -112,7 +112,7 @@ func (b *App) deleteTask(name string) error {
 	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/Delete", "/TN", tn, "/F"})
 	o, err := cmd.CombinedOutput()
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("delete task out=%s err=%v", strings.TrimSpace(string(o)), err))
+		wails.LogErrorf(b.ctx, "delete task out=%s err=%v", strings.TrimSpace(string(o)), err)
 		return err
 	}
 
@@ -128,7 +128,7 @@ func (b *App) runTask(name string) error {
 	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/Run", "/TN", tn, "/I"})
 	o, err := cmd.CombinedOutput()
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("run task out=%s err=%v", strings.TrimSpace(string(o)), err))
+		wails.LogErrorf(b.ctx, "run task out=%s err=%v", strings.TrimSpace(string(o)), err)
 		return err
 	}
 	return nil
@@ -143,7 +143,7 @@ func (b *App) endTask(name string) error {
 	cmd := getCmd(b.ctx, "schtasks.exe", []string{"/End", "/TN", tn})
 	o, err := cmd.CombinedOutput()
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("end task out=%s err=%v", strings.TrimSpace(string(o)), err))
+		wails.LogErrorf(b.ctx, "end task out=%s err=%v", strings.TrimSpace(string(o)), err)
 		return err
 	}
 	return nil

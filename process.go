@@ -70,17 +70,17 @@ func (b *App) Start(name string, params []string, task bool) string {
 	b.processMap[name] = params
 	if task {
 		if err := b.endTask(name); err != nil {
-			wails.LogError(b.ctx, fmt.Sprintf("end task name=%v err=%v", name, err))
+			wails.LogErrorf(b.ctx, "end task name=%v err=%v", name, err)
 		}
 		if err := b.deleteTask(name); err != nil {
-			wails.LogError(b.ctx, fmt.Sprintf("delete task name=%v err=%v", name, err))
+			wails.LogErrorf(b.ctx, "delete task name=%v err=%v", name, err)
 		}
 		if err := b.createTask(name, params); err != nil {
-			wails.LogError(b.ctx, fmt.Sprintf("create task name=%v err=%v", name, err))
+			wails.LogErrorf(b.ctx, "create task name=%v err=%v", name, err)
 			return fmt.Sprintf("タスクを登録できません:%v", err)
 		}
 		if err := b.runTask(name); err != nil {
-			wails.LogError(b.ctx, fmt.Sprintf("run task name=%v err=%v", name, err))
+			wails.LogErrorf(b.ctx, "run task name=%v err=%v", name, err)
 			return fmt.Sprintf("タスクを起動できません:%v", err)
 		}
 		b.saveConfig()
@@ -92,7 +92,7 @@ func (b *App) Start(name string, params []string, task bool) string {
 	}
 	cmd := getCmd(b.ctx, b.getExec(name), params)
 	if err := cmd.Start(); err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("Start name=%v err=%v", name, err))
+		wails.LogErrorf(b.ctx, "Start name=%v err=%v", name, err)
 		return fmt.Sprintf("起動できません err=%v", err)
 	}
 	if cmd.Process != nil {
@@ -117,7 +117,7 @@ func (b *App) getExec(name string) string {
 	} else if dir, err := os.Getwd(); err == nil {
 		ret = path.Join(dir, ret)
 	} else {
-		wails.LogError(b.ctx, fmt.Sprintf("getExec name=%v err=%v", name, err))
+		wails.LogErrorf(b.ctx, "getExec name=%v err=%v", name, err)
 	}
 	if runtime.GOOS == "windows" {
 		ret += ".exe"
@@ -143,15 +143,15 @@ func (b *App) Stop(name string) string {
 				}
 			}
 			if err := b.endTask(name); err != nil {
-				wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
+				wails.LogErrorf(b.ctx, "Stop name=%v err=%v", name, err)
 				return fmt.Sprintf("タスクを停止できません:%v", err)
 			}
 			if err := b.deleteTask(name); err != nil {
-				wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
+				wails.LogErrorf(b.ctx, "Stop name=%v err=%v", name, err)
 				return fmt.Sprintf("タスクを削除できません:%v", err)
 			}
 			if p := b.findProcess(name); p != nil {
-				wails.LogError(b.ctx, fmt.Sprintf("kill name=%v", name))
+				wails.LogErrorf(b.ctx, "kill name=%v", name)
 				p.Kill()
 			}
 			return ""
@@ -174,10 +174,10 @@ func (b *App) Stop(name string) string {
 			}
 		} else {
 			if err := p.SendSignal(syscall.SIGINT); err != nil {
-				wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
+				wails.LogErrorf(b.ctx, "Stop name=%v err=%v", name, err)
 			}
 			if err := p.SendSignal(syscall.SIGTERM); err != nil {
-				wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v err=%v", name, err))
+				wails.LogErrorf(b.ctx, "Stop name=%v err=%v", name, err)
 			}
 			for i := 0; i < 5; i++ {
 				time.Sleep(time.Second * 2)
@@ -186,12 +186,12 @@ func (b *App) Stop(name string) string {
 					return ""
 				}
 			}
-			wails.LogError(b.ctx, fmt.Sprintf("kill name=%v", name))
+			wails.LogErrorf(b.ctx, "kill name=%v", name)
 			p.Kill()
 			return "強制終了しました"
 		}
 	}
-	wails.LogError(b.ctx, fmt.Sprintf("Stop name=%v process not found", name))
+	wails.LogErrorf(b.ctx, "Stop name=%v process not found", name)
 	return ""
 }
 
@@ -212,7 +212,7 @@ func (b *App) Delete(name string) string {
 func (b *App) findProcess(name string) *process.Process {
 	_, ok := b.processMap[name]
 	if !ok {
-		wails.LogError(b.ctx, fmt.Sprintf("processMap not found name=%v", name))
+		wails.LogErrorf(b.ctx, "processMap not found name=%v", name)
 		return nil
 	}
 	oname := name
@@ -225,7 +225,7 @@ func (b *App) findProcess(name string) *process.Process {
 	name = strings.ToLower(name)
 	list, err := process.Processes()
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("find process list name=%v err=%v", name, err))
+		wails.LogErrorf(b.ctx, "find process list name=%v err=%v", name, err)
 		return nil
 	}
 	for _, p := range list {
@@ -238,7 +238,7 @@ func (b *App) findProcess(name string) *process.Process {
 			wails.LogErrorf(b.ctx, "checkParam name=%s err=%v cp='%s' cls=%v", name, err, cp, cls)
 		}
 	}
-	wails.LogError(b.ctx, fmt.Sprintf("process not found name=%v", oname))
+	wails.LogDebugf(b.ctx, "process not found name=%v", oname)
 	return nil
 }
 
@@ -273,7 +273,7 @@ func (b *App) stopByUdp(pid int) {
 				defer conn.Close()
 				_, err = conn.Write([]byte(fmt.Sprintf("%d", pid)))
 				if err != nil {
-					wails.LogError(b.ctx, fmt.Sprintf("stopByUdp pid=%v err=%v", pid, err))
+					wails.LogErrorf(b.ctx, "stopByUdp pid=%v err=%v", pid, err)
 				}
 			}
 		}()
@@ -288,13 +288,13 @@ func (b *App) needWindowsPrivilege() bool {
 		for _, p := range list {
 			if _, err := p.Name(); err != nil && strings.Contains(err.Error(), "Access is denied.") {
 				//  Access is denied.で名前の取得できないプロセスがあるのは、権限がないため
-				wails.LogError(b.ctx, fmt.Sprintf("NeedWinPrivilege err=%v", err))
+				wails.LogErrorf(b.ctx, "NeedWinPrivilege err=%v", err)
 				return true
 			}
 		}
 	} else {
 		if strings.Contains(err.Error(), "Access is denied.") {
-			wails.LogError(b.ctx, fmt.Sprintf("NeedWinPrivilege err=%v", err))
+			wails.LogErrorf(b.ctx, "NeedWinPrivilege err=%v", err)
 			return true
 		}
 	}

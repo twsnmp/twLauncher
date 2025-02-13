@@ -32,7 +32,7 @@ func (b *App) startup(ctx context.Context) {
 	b.ctx = ctx
 	wails.LogDebug(b.ctx, "startup")
 	if err := b.loadConfig(); err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("load config err=%v", err))
+		wails.LogErrorf(b.ctx, "load config err=%v", err)
 	}
 }
 
@@ -40,7 +40,7 @@ func (b *App) startup(ctx context.Context) {
 func (b *App) shutdown(ctx context.Context) {
 	wails.LogDebug(b.ctx, "shutdown")
 	if err := b.saveConfig(); err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("save config err=%v", err))
+		wails.LogErrorf(b.ctx, "save config err=%v", err)
 	}
 }
 
@@ -51,7 +51,7 @@ func (b *App) GetDataStore() string {
 		CanCreateDirectories: true,
 	})
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("GetDataStore err=%v", err))
+		wails.LogErrorf(b.ctx, "GetDataStore err=%v", err)
 	}
 	return dir
 }
@@ -98,7 +98,7 @@ func (b *App) GetInfo() LanuncherInfo {
 func (b *App) pcapVersion() string {
 	_, err := pcap.FindAllDevs()
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("pcapVersion err=%v", err))
+		wails.LogErrorf(b.ctx, "pcapVersion err=%v", err)
 		return ""
 	}
 	wails.LogInfo(b.ctx, pcap.Version())
@@ -110,7 +110,7 @@ func (b *App) getIfaces() []selectDataEnt {
 	// Find all ifaces
 	ifaces, err := pcap.FindAllDevs()
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("getIfaces err=%v", err))
+		wails.LogErrorf(b.ctx, "getIfaces err=%v", err)
 		return ret
 	}
 	for _, i := range ifaces {
@@ -183,7 +183,7 @@ func (b *App) GetFile(title string) string {
 		Title: title,
 	})
 	if err != nil {
-		wails.LogError(b.ctx, fmt.Sprintf("GetFile err=%v", err))
+		wails.LogErrorf(b.ctx, "GetFile err=%v", err)
 	}
 	return conf
 }
