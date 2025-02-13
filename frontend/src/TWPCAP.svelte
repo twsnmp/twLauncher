@@ -93,16 +93,16 @@
     <Input
       color={syslogError ? "red" : "base"}
       bind:value={conf.Syslog}
-      class="mt-1"
+      class="h-6 mt-1"
     />
-    <Helper class="mt-2" color={syslogError ? "red" : "gray"}>
+    <Helper class="mt-1" color={syslogError ? "red" : "gray"}>
       syslogの送信先をカンマ区切りで指定してください。
     </Helper>
   </Label>
   <Label
     >LANポート
     <Select
-      class="mt-1"
+      class="h-6 mt-1"
       color={ifaceError ? "red" : "base"}
       bind:value={conf.Iface}
       placeholder=""
@@ -115,7 +115,7 @@
         {/if}
       {/each}
     </Select>
-    <Helper class="mt-2" color={ifaceError ? "red" : "gray"}>
+    <Helper class="mt-1" color={ifaceError ? "red" : "gray"}>
       パケットキャプチャーするLANポートを指定してください。
     </Helper>
   </Label>
@@ -123,14 +123,14 @@
   <div class="flex">
     <Label>
       <span>送信周期(秒)</span>
-      <Input type="number" class="w-2 mt-1" bind:value={conf.Interval} />
+      <Input type="number" class="w-2 mt-1 h-6" bind:value={conf.Interval} />
     </Label>
     <Label class="ml-3">
       <span>保存時間(秒)</span>
-      <Input type="number" class="w-3 mt-1" bind:value={conf.Retention} />
+      <Input type="number" class="w-3 mt-1 h-6" bind:value={conf.Retention} />
     </Label>
     {#if info.Env == "windows" && !info.NeedPriv}
-      <Toggle class="ml-3 mt-3" bind:checked={conf.Task}>スケジューラー</Toggle>
+      <Toggle class="ml-3 mt-4 h-6" bind:checked={conf.Task}>スケジューラー</Toggle>
     {/if}
   </div>
   {#if info.PcapVersion}

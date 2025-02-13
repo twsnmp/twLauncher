@@ -55,13 +55,39 @@ export const makeTwWinLogParams = (conf) => {
   return params;
 };
 
+export const makeTwLogEyeParams = (conf) => {
+  const params = [];
+  params.push("start");
+  params.push("--apiPort");
+  params.push(conf.APIPort + "");
+  params.push("--config");
+  params.push(conf.ConfFile);
+  if (conf.Key && conf.Cert) {
+    params.push("--serverKey");
+    params.push(conf.Key);
+    params.push("--serverCert");
+    params.push(conf.Cert);
+  }
+  if (conf.CACert) {
+    params.push("--caCert");
+    params.push(conf.CACert);
+  }
+  console.log(params);
+  return params;
+};
+
+
 export const getConfFromParams = (info,params, task) => {
   const conf = {
     DataStore: "",
     Password: "",
     Local: false,
     Port: 8080,
-
+    APIPort: 8081,
+    ConfFile: "",
+    Key: "",
+    Cert: "",
+    CACert: "",
     Syslog: "",
     Interval: 600,
     Retention: 3600,
@@ -128,6 +154,36 @@ export const getConfFromParams = (info,params, task) => {
           conf.User = params[i + 1];
           i++;
         }
+      case "--apiPort":
+        if (i < params.length - 1) {
+          conf.APIPort = params[i + 1] * 1;
+          i++;
+        }
+        break;
+      case "--config":
+        if (i < params.length - 1) {
+          conf.ConfFile = params[i + 1];
+          i++;
+        }
+        break;
+      case "--serverKey":
+        if (i < params.length - 1) {
+          conf.Key = params[i + 1];
+          i++;
+        }
+        break;
+      case "--serverCert":
+        if (i < params.length - 1) {
+          conf.Cert = params[i + 1];
+          i++;
+        }
+        break;
+      case "--caCert":
+        if (i < params.length - 1) {
+          conf.CACert = params[i + 1];
+          i++;
+        }
+        break;
     }
   }
   if (conf.Interval < 60) {

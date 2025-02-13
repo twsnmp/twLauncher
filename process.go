@@ -117,9 +117,7 @@ func (b *App) getExec(name string) string {
 	} else {
 		wails.LogError(b.ctx, fmt.Sprintf("getExec name=%v err=%v", name, err))
 	}
-	if runtime.GOOS == "darwin" {
-		ret += ".app"
-	} else {
+	if runtime.GOOS == "windows" {
 		ret += ".exe"
 	}
 	wails.LogDebug(b.ctx, fmt.Sprintf("get exec ret=%s", ret))
@@ -253,7 +251,7 @@ func checkParam(name, cp string, p []string) bool {
 	for i, v := range p {
 		if i+1 < len(p) {
 			switch v {
-			case "-port", "-remote", "-iface":
+			case "-port", "-remote", "-iface", "--apiPort":
 				s := strings.ReplaceAll(p[i+1], "\"", "")
 				if s == cp {
 					return true

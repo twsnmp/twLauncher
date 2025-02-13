@@ -60,35 +60,35 @@
     <Input
       color={syslogError ? "red" : "base"}
       bind:value={conf.Syslog}
-      class="mt-1"
+      class="mt-1 h-6"
     />
-    <Helper class="mt-2" color={syslogError ? "red" : "gray"}>
+    <Helper class="mt-1" color={syslogError ? "red" : "gray"}>
       syslogの送信先をカンマ区切りで指定してください。
     </Helper>
   </Label>
   <Label>
     <span>リモート</span>
-    <Input class ="mt-1" bind:value={conf.Remote} />
+    <Input class ="mt-1 h-6" bind:value={conf.Remote} />
   </Label>
   {#if conf.Remote}
     <div class="flex">
       <Label>
         <span>ユーザー</span>
-        <Input class="mt-1" bind:value={conf.User}/>
+        <Input class="mt-1 h-6" bind:value={conf.User}/>
       </Label>
       <Label class="ml-3">
         <span>パスワード</span>
-        <Input type="password" bind:value={conf.Password}/>
+        <Input class="mt-1 h-6" type="password" bind:value={conf.Password}/>
       </Label>
     </div>
   {/if}
   <div class="flex">
     <Label>
       <span>送信周期(秒)</span>
-      <Input type="number" class="w-3 mt-1" bind:value={conf.Interval}/>
+      <Input type="number" class="w-3 mt-1 h-6" bind:value={conf.Interval}/>
     </Label>
     {#if info.Env =="windows" && !info.NeedPriv}
-      <Toggle class="ml-3 mt-3" bind:checked={conf.Task} >スケジューラー</Toggle>
+      <Toggle class="ml-3 mt-4 h-6" bind:checked={conf.Task} >スケジューラー</Toggle>
     {/if}
   </div>
   <Button on:click={start}>起動</Button>

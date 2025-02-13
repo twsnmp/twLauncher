@@ -176,3 +176,14 @@ func getIPv4(addrs []pcap.InterfaceAddress) string {
 	}
 	return r
 }
+
+// GetFile : ファイルを選択する
+func (b *App) GetFile(title string) string {
+	conf, err := wails.OpenFileDialog(b.ctx, wails.OpenDialogOptions{
+		Title: title,
+	})
+	if err != nil {
+		wails.LogError(b.ctx, fmt.Sprintf("GetFile err=%v", err))
+	}
+	return conf
+}

@@ -6,12 +6,14 @@
     makeTwpcapParams,
     makeTwWifiScanParams,
     makeTwWinLogParams,
+    makeTwLogEyeParams,
     getConfFromParams,
   } from "./conf.js";
   import TWSNMPFC from "./TWSNMPFC.svelte";
   import TWPCAP from "./TWPCAP.svelte";
   import TWWifiScan from "./TWWifiScan.svelte";
   import TWWinLog from "./TWWinLog.svelte";
+  import TWLogEye from "./TWLogEye.svelte";
   import URL from "./URL.svelte";
   import {
     GetInfo,
@@ -54,6 +56,8 @@
   let twWifiScanConf = {};
   let twWinLogModal = false;
   let twWinLogConf = {};
+  let twLogEyeModal = false;
+  let twLogEyeConf = {};
   let urlModal = false;
   let remoteTwsnmpfcUrl = "";
 
@@ -98,6 +102,7 @@
       await Delete(oldName);
       oldName = "";
     }
+    console.log(name, params, task);
     const r = await Start(name, params, task);
     infoMsg = "";
     if (r == "") {
@@ -145,6 +150,8 @@
       showTwWifiScanModal(name, params, task);
     } else if (name.startsWith("twWinLog")) {
       showTwWinLogModal(name, params, task);
+    } else if (name.startsWith("twlogeye")) {
+      showTwLogEyeModal(name, params, task);
     }
   };
 
@@ -196,6 +203,17 @@
           startProcess(
             name,
             makeTwWinLogParams(e.detail.conf),
+            e.detail.conf.Task
+          );
+        }
+        break;
+      case "twlogeye":
+        twLogEyeModal = false;
+        if (e.detail.start) {
+          const name = "twlogeye:" + e.detail.conf.APIPort;
+          startProcess(
+            name,
+            makeTwLogEyeParams(e.detail.conf),
             e.detail.conf.Task
           );
         }
@@ -283,6 +301,24 @@
       twWinLogConf = getConfFromParams(info, params, task);
     }
     twWinLogModal = true;
+  };
+
+  const showTwLogEyeModal = (name, params, task) => {
+    if (name == "") {
+      twLogEyeConf = {
+        ConfFile: "",
+        APIPort: 8081,
+        Key: "",
+        Cert: "",
+        CACert: "",
+        Task: false,
+      };
+      oldName = "";
+    } else {
+      oldName = name;
+      twLogEyeConf = getConfFromParams(info, params, task);
+    }
+    twLogEyeModal = true;
   };
 
   const showUrlModal = (url) => {
@@ -446,6 +482,12 @@
       <i class="fa-brands fa-windows" />
     </SpeedDialButton>
   {/if}
+  <SpeedDialButton 
+    name="LogEye"
+    on:click={() => showTwLogEyeModal("", [], false)}
+  >
+    <i class="fa-solid fa-eye" />
+  </SpeedDialButton>
   <SpeedDialButton
     name="URL"
     on:click={() => showUrlModal("")}
@@ -475,6 +517,12 @@
   {info}
   conf={twWinLogConf}
   show={twWinLogModal}
+  on:done={handleDone}
+/>
+<TWLogEye
+  {info}
+  conf={twLogEyeConf}
+  show={twLogEyeModal}
   on:done={handleDone}
 />
 
