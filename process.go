@@ -83,6 +83,7 @@ func (b *App) Start(name string, params []string, task bool) string {
 			wails.LogError(b.ctx, fmt.Sprintf("run task name=%v err=%v", name, err))
 			return fmt.Sprintf("タスクを起動できません:%v", err)
 		}
+		b.saveConfig()
 		return ""
 	}
 	if p := b.findProcess(name); p != nil {
@@ -97,6 +98,7 @@ func (b *App) Start(name string, params []string, task bool) string {
 	if cmd.Process != nil {
 		go cmd.Process.Wait()
 	}
+	b.saveConfig()
 	return ""
 }
 
@@ -201,6 +203,7 @@ func (b *App) Delete(name string) string {
 		}
 	}
 	delete(b.processMap, name)
+	b.saveConfig()
 	wails.LogDebugf(b.ctx, "Delete name=%v", name)
 	return ""
 }
