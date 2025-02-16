@@ -1,8 +1,8 @@
 module github.com/twsnmp/twLanuncher
 
-go 1.22.0
+go 1.24
 
-toolchain go1.22.10
+toolchain go1.24.0
 
 require (
 	github.com/fatih/color v1.18.0
