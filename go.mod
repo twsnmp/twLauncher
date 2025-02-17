@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/google/gopacket v1.1.19
 	github.com/shirou/gopsutil/v3 v3.24.5
-	github.com/wailsapp/wails/v2 v2.10.0
+	github.com/wailsapp/wails/v2 v2.9.3
 )
 
 require (
