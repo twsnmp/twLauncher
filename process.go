@@ -243,6 +243,9 @@ func (b *App) findProcess(name string) *process.Process {
 }
 
 func checkParam(name, cp string, p []string) bool {
+	if name == "twwifiscan" {
+		return true
+	}
 	if name == "twwinlog" && cp == "" {
 		for _, v := range p {
 			if v == "-remote" {
