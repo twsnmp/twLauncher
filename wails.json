@@ -13,8 +13,8 @@
   "Info": {
     "companyName": "TWSNMP",
     "productName": "TWSNMP FC",
-    "productVersion": "1.54.0",
-    "copyright": "Copyright 2021 Masayuki Yamai",
+    "productVersion": "1.55.0",
+    "copyright": "Copyright 2021-2025 Masayuki Yamai",
     "comments": "twLaouncer built using Wails (https://wails.io)"
   }
 }
