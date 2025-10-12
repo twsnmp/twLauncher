@@ -1,7 +1,7 @@
 version: '3'
 
 vars:
-  VERSION: v1.59.0
+  VERSION: v1.60.0
   COMMIT:
     sh: git rev-parse --short HEAD
 
