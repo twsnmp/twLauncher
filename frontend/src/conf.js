@@ -94,6 +94,7 @@ export const getConfFromParams = (info,params, task) => {
     Iface: "",
     Remote: "",
     User: "",
+    TLS: false,
     Task: task && info.Env == "windows",
   };
   for (let i = 0; i < params.length; i++) {
@@ -118,6 +119,9 @@ export const getConfFromParams = (info,params, task) => {
         break;
       case "-local":
         conf.Local = true;
+        break;
+      case "-tls":
+        conf.TLS = true;
         break;
       case "-syslog":
         if (i < params.length - 1) {
