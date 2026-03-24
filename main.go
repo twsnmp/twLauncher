@@ -41,7 +41,7 @@ func main() {
 		Mac: &mac.Options{
 			About: &mac.AboutInfo{
 				Title:   "TWSNMP起動/設定ツール",
-				Message: fmt.Sprintf("twLauncher %s(%s) © 2021 Masayuki Yamai", version, commit),
+				Message: fmt.Sprintf("twLauncher %s(%s) © 2021-2026 Masayuki Yamai", version, commit),
 				Icon:    icon,
 			},
 		},

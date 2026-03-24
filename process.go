@@ -33,7 +33,7 @@ func (b *App) GetProcessInfoList() []ProcessInfo {
 		task := false
 		running := false
 		if strings.HasPrefix(name, "http") {
-			running = b.checkUrl(name)
+			running = b.checkURL(name)
 		} else {
 			running = b.findProcess(name) != nil
 			task = b.findTask(name) == nil
@@ -48,7 +48,7 @@ func (b *App) GetProcessInfoList() []ProcessInfo {
 	return ret
 }
 
-func (b *App) checkUrl(url string) bool {
+func (b *App) checkURL(url string) bool {
 	ctx, cancel := context.WithTimeout(b.ctx, 10*time.Second)
 	defer cancel()
 	req, err := http.NewRequest("GET", url, nil)
@@ -126,7 +126,7 @@ func (b *App) getExec(name string) string {
 	return ret
 }
 
-// Stop: プロセスを停止する
+// Stop : プロセスを停止する
 func (b *App) Stop(name string) string {
 	wails.LogDebug(b.ctx, fmt.Sprintf("Stop name=%v", name))
 	info := b.GetInfo()
@@ -138,7 +138,7 @@ func (b *App) Stop(name string) string {
 					if p == nil {
 						break
 					}
-					b.stopByUdp(int(p.Pid))
+					b.stopByUDP(int(p.Pid))
 					time.Sleep(time.Second * 2)
 				}
 			}
@@ -161,7 +161,7 @@ func (b *App) Stop(name string) string {
 		if runtime.GOOS == "windows" {
 			if strings.HasPrefix(name, "twsnmpfc") {
 				for i := 0; i < 15; i++ {
-					b.stopByUdp(int(p.Pid))
+					b.stopByUDP(int(p.Pid))
 					time.Sleep(time.Second * 2)
 					p := b.findProcess(name)
 					if p == nil {
@@ -195,7 +195,7 @@ func (b *App) Stop(name string) string {
 	return ""
 }
 
-// Delete: プロセスを削除する
+// Delete : プロセスを削除する
 func (b *App) Delete(name string) string {
 	if !strings.HasPrefix(name, "http") {
 		if p := b.findProcess(name); p != nil {
@@ -268,7 +268,7 @@ func checkParam(name, cp string, p []string) bool {
 	return false
 }
 
-func (b *App) stopByUdp(pid int) {
+func (b *App) stopByUDP(pid int) {
 	for i := 8080; i < 8180; i++ {
 		func() {
 			conn, err := net.Dial("udp4", fmt.Sprintf("127.0.0.1:%d", i))
@@ -276,7 +276,7 @@ func (b *App) stopByUdp(pid int) {
 				defer conn.Close()
 				_, err = conn.Write([]byte(fmt.Sprintf("%d", pid)))
 				if err != nil {
-					wails.LogErrorf(b.ctx, "stopByUdp pid=%v err=%v", pid, err)
+					wails.LogErrorf(b.ctx, "stopByUDP pid=%v err=%v", pid, err)
 				}
 			}
 		}()
