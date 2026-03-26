@@ -22,6 +22,7 @@
     Stop,
     Delete,
     Save,
+    ResetPassword,
   } from "../wailsjs/go/main/App";
   import { BrowserOpenURL } from "../wailsjs/runtime/runtime";
   import {
@@ -137,6 +138,20 @@
       waitModal = false;
     } else {
       errorMsg = name + "削除エラー:" + r;
+    }
+    await updateProcessList();
+  };
+
+  const resetPassword = async (name) => {
+    errorMsg = "";
+    infoMsg = name + "のパスワードをリセットしています。お待ち下さい。";
+    waitModal = true;
+    const r = await ResetPassword(name);
+    infoMsg = "";
+    if (r === "") {
+      waitModal = false;
+    } else {
+      errorMsg = name + "のパスワードリセットエラー:" + r;
     }
     await updateProcessList();
   };
@@ -377,6 +392,7 @@
     <TableHeadCell>名前</TableHeadCell>
     <TableHeadCell>起動/停止</TableHeadCell>
     <TableHeadCell>表示</TableHeadCell>
+    <TableHeadCell>PW初期化</TableHeadCell>
     <TableHeadCell>削除</TableHeadCell>
   </TableHead>
   <TableBody class="divide-y">
@@ -437,6 +453,19 @@
               }}
             >
               <i class="fa-brands fa-chrome"></i>
+            </Button>
+          {/if}
+        </TableBodyCell>
+        <TableBodyCell>
+          {#if !p.Running && p.Name.startsWith("twsnmpfc")}
+            <Button
+              class="w-2"
+              color="red"
+              on:click={() => {
+                resetPassword(p.Name);
+              }}
+            >
+              <i class="fa-solid fa-rotate-left" />
             </Button>
           {/if}
         </TableBodyCell>

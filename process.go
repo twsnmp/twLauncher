@@ -208,6 +208,43 @@ func (b *App) Delete(name string) string {
 	return ""
 }
 
+// ResetPassword : プロセスパスワードをリセットする
+func (b *App) ResetPassword(name string) string {
+	if !strings.HasPrefix(name, "twsnmpfc") {
+		return "twsnmpfcのみパスワードリセットが可能です。"
+	}
+	if p := b.findProcess(name); p != nil {
+		return "稼働中です。"
+	}
+	ret, err := wails.MessageDialog(b.ctx, wails.MessageDialogOptions{
+		Title:         "パスワードリセット",
+		Message:       "パスワードをリセットします。よろしいですか？",
+		Type:          wails.QuestionDialog,
+		Buttons:       []string{"Yes", "No"},
+		DefaultButton: "No",
+		CancelButton:  "No",
+	})
+	if err != nil {
+		return fmt.Sprintf("エラー: %v", err)
+	}
+	if ret == "Yes" {
+		params := []string{"--resetPassword"}
+		if p, ok := b.processMap[name]; ok {
+			params = append(params, p...)
+		} else {
+			return "設定がありません。"
+		}
+		cmd := getCmd(b.ctx, b.getExec(name), params)
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			wails.LogErrorf(b.ctx, "ResetPassword name=%v err=%v out=%s", name, err, string(out))
+			return fmt.Sprintf("パスワードリセットできません err=%v", err)
+		}
+		wails.LogInfof(b.ctx, "ResetPassword name=%v out=%s", name, string(out))
+	}
+	return ""
+}
+
 // findProcess : 起動中のプロセスを探す
 func (b *App) findProcess(name string) *process.Process {
 	_, ok := b.processMap[name]
