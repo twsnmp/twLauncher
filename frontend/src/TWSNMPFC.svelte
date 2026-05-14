@@ -67,7 +67,7 @@
   };
 </script>
 
-<Modal bind:open={show} size="md" autoclose={false} class="w-full">
+<Modal bind:open={show} size="md" autoclose={false} permanent class="w-full">
   <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">
     TWSNMP FCの起動
   </h3>
