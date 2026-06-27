@@ -40,38 +40,39 @@
     Button,
     Indicator,
     SpeedDial,
+    SpeedDialTrigger,
     SpeedDialButton,
     Alert,
     Modal,
     Badge,
   } from "flowbite-svelte";
 
-  let infoMsg = "";
-  let errorMsg = "";
-  let oldName = "";
-  let twsnmpfcModal = false;
-  let twsnmpfcConf = {};
-  let twpcapModal = false;
-  let twpcapConf = {};
-  let twWifiScanModal = false;
-  let twWifiScanConf = {};
-  let twWinLogModal = false;
-  let twWinLogConf = {};
-  let twLogEyeModal = false;
-  let twLogEyeConf = {};
-  let urlModal = false;
-  let remoteTwsnmpfcUrl = "";
+  let infoMsg = $state("");
+  let errorMsg = $state("");
+  let oldName = $state("");
+  let twsnmpfcModal = $state(false);
+  let twsnmpfcConf = $state({});
+  let twpcapModal = $state(false);
+  let twpcapConf = $state({});
+  let twWifiScanModal = $state(false);
+  let twWifiScanConf = $state({});
+  let twWinLogModal = $state(false);
+  let twWinLogConf = $state({});
+  let twLogEyeModal = $state(false);
+  let twLogEyeConf = $state({});
+  let urlModal = $state(false);
+  let remoteTwsnmpfcUrl = $state("");
 
-  let info = {
+  let info = $state({
     Version: "",
     Env: "",
     NeedPriv: false,
     Ifaces: [],
     PcapVersion: "",
-  };
+  });
 
-  let proceses = [];
-  let waitModal = false;
+  let proceses = $state([]);
+  let waitModal = $state(false);
 
   onMount(async () => {
     const r = await GetInfo();
@@ -175,66 +176,67 @@
   };
 
   const handleDone = (e) => {
-    switch (e.detail.type) {
+    const detail = e.detail || e;
+    switch (detail.type) {
       case "twsnmpfc":
         twsnmpfcModal = false;
-        if (e.detail.start) {
-          const name = "twsnmpfc:" + e.detail.conf.Port;
+        if (detail.start) {
+          const name = "twsnmpfc:" + detail.conf.Port;
           startProcess(
             name,
-            makeTwsnmpfcParams(e.detail.conf),
-            e.detail.conf.Task,
+            makeTwsnmpfcParams(detail.conf),
+            detail.conf.Task,
           );
         }
         break;
       case "twpcap":
         twpcapModal = false;
-        if (e.detail.start) {
-          const name = "twpcap:" + e.detail.conf.Iface;
+        if (detail.start) {
+          const name = "twpcap:" + detail.conf.Iface;
           startProcess(
             name,
-            makeTwpcapParams(e.detail.conf),
-            e.detail.conf.Task,
+            makeTwpcapParams(detail.conf),
+            detail.conf.Task,
           );
         }
         break;
       case "twWifiScan":
         twWifiScanModal = false;
-        if (e.detail.start) {
+        if (detail.start) {
           const name = "twWifiScan";
           startProcess(
             name,
-            makeTwWifiScanParams(e.detail.conf),
-            e.detail.conf.Task,
+            makeTwWifiScanParams(detail.conf),
+            detail.conf.Task,
           );
         }
         break;
       case "twWinLog":
         twWinLogModal = false;
-        if (e.detail.start) {
-          const name = "twWinLog:" + e.detail.conf.Remote;
+        if (detail.start) {
+          const name = "twWinLog:" + detail.conf.Remote;
           startProcess(
             name,
-            makeTwWinLogParams(e.detail.conf),
-            e.detail.conf.Task,
+            makeTwWinLogParams(detail.conf),
+            detail.conf.Task,
           );
         }
         break;
       case "twlogeye":
         twLogEyeModal = false;
-        if (e.detail.start) {
-          const name = "twlogeye:" + e.detail.conf.APIPort;
+        if (detail.start) {
+          const name = "twlogeye:" + detail.conf.APIPort;
           startProcess(
             name,
-            makeTwLogEyeParams(e.detail.conf),
-            e.detail.conf.Task,
+            makeTwLogEyeParams(detail.conf),
+            detail.conf.Task,
           );
         }
         break;
       case "url":
         urlModal = false;
-        if (e.detail.url) {
-          saveUrl(e.detail.url);
+        if (detail.url) {
+          saveUrl(detail.url);
         }
         break;
     }
@@ -242,11 +244,20 @@
 
   // URLを保存する
   const saveUrl = async (url) => {
-    if (oldName != "") {
-      await Delete(oldName);
+    try {
+      console.log("saveUrl target:", url);
+      if (oldName != "") {
+        console.log("deleting oldName:", oldName);
+        await Delete(oldName);
+      }
+      const r = await Save(url);
+      console.log("Save result:", r);
+      await updateProcessList();
+    } catch (err) {
+      console.error("saveUrl error:", err);
+      errorMsg = "URL保存エラー: " + err;
+      waitModal = false;
     }
-    await Save(url);
-    updateProcessList();
   };
 
   const showTwsnmpfcModal = (name, params, task) => {
@@ -376,12 +387,12 @@
     <Button
       class="!p-2 ml-2 text-xl"
       color="teal"
-      on:click={() => updateProcessList()}
+      onclick={() => updateProcessList()}
     >
       <i class="fa-solid fa-rotate"></i>
     </Button>
-    <Button class="!p-2 ml-2 text-xl" color="teal" on:click={help}>
-      <i class="fa-regular fa-circle-question" />
+    <Button class="!p-2 ml-2 text-xl" color="teal" onclick={help}>
+      <i class="fa-regular fa-circle-question"></i>
     </Button>
   </div>
 </Navbar>
@@ -416,7 +427,8 @@
           {#if p.Name.startsWith("http")}
             <Button
               class="w-2"
-              on:click={() => {
+              color="teal"
+              onclick={() => {
                 showUrlModal(p.Name);
               }}
             >
@@ -426,20 +438,21 @@
             <Button
               class="w-2"
               color="red"
-              on:click={() => {
+              onclick={() => {
                 stopProcess(p.Name);
               }}
             >
-              <i class="fa-solid fa-stop" />
+              <i class="fa-solid fa-stop"></i>
             </Button>
           {:else}
             <Button
               class="w-2"
-              on:click={() => {
+              color="teal"
+              onclick={() => {
                 showModal(p.Name, p.Params, p.Task);
               }}
             >
-              <i class="fa-solid fa-play" />
+              <i class="fa-solid fa-play"></i>
             </Button>
           {/if}
         </TableBodyCell>
@@ -448,7 +461,7 @@
             <Button
               class="w-2"
               color="blue"
-              on:click={() => {
+              onclick={() => {
                 open(p.Name, p.Params);
               }}
             >
@@ -461,11 +474,11 @@
             <Button
               class="w-2"
               color="red"
-              on:click={() => {
+              onclick={() => {
                 resetPassword(p.Name);
               }}
             >
-              <i class="fa-solid fa-rotate-left" />
+              <i class="fa-solid fa-rotate-left"></i>
             </Button>
           {/if}
         </TableBodyCell>
@@ -474,11 +487,11 @@
             <Button
               class="w-2"
               color="red"
-              on:click={() => {
+              onclick={() => {
                 deleteProcess(p.Name);
               }}
             >
-              <i class="fa-solid fa-trash" />
+              <i class="fa-solid fa-trash"></i>
             </Button>
           {/if}
         </TableBodyCell>
@@ -486,41 +499,42 @@
     {/each}
   </TableBody>
 </Table>
-<SpeedDial defaultClass="absolute right-6 bottom-20" tooltip="none">
+<SpeedDialTrigger class="absolute right-6 bottom-20" color="teal" />
+<SpeedDial tooltip="none" placement="top">
   <SpeedDialButton
     name="twsnmp"
-    on:click={() => showTwsnmpfcModal("", [], false)}
+    onclick={() => showTwsnmpfcModal("", [], false)}
   >
-    <i class="fa-solid fa-list-check" />
+    <i class="fa-solid fa-list-check"></i>
   </SpeedDialButton>
   <SpeedDialButton
     name="twpcap"
-    on:click={() => showTwpcapModal("", [], false)}
+    onclick={() => showTwpcapModal("", [], false)}
   >
-    <i class="fa-solid fa-network-wired" />
+    <i class="fa-solid fa-network-wired"></i>
   </SpeedDialButton>
   <SpeedDialButton
     name="Wifi"
-    on:click={() => showTwWifiScanModal("", [], false)}
+    onclick={() => showTwWifiScanModal("", [], false)}
   >
-    <i class="fa-solid fa-wifi" />
+    <i class="fa-solid fa-wifi"></i>
   </SpeedDialButton>
   {#if info.Env.startsWith("win")}
     <SpeedDialButton
       name="WinLog"
-      on:click={() => showTwWinLogModal("", [], false)}
+      onclick={() => showTwWinLogModal("", [], false)}
     >
-      <i class="fa-brands fa-windows" />
+      <i class="fa-brands fa-windows"></i>
     </SpeedDialButton>
   {/if}
   <SpeedDialButton
     name="LogEye"
-    on:click={() => showTwLogEyeModal("", [], false)}
+    onclick={() => showTwLogEyeModal("", [], false)}
   >
-    <i class="fa-solid fa-eye" />
+    <i class="fa-solid fa-eye"></i>
   </SpeedDialButton>
-  <SpeedDialButton name="URL" on:click={() => showUrlModal("")}>
-    <i class="fa-brands fa-chrome" />
+  <SpeedDialButton name="URL" onclick={() => showUrlModal("")}>
+    <i class="fa-brands fa-chrome"></i>
   </SpeedDialButton>
 </SpeedDial>
 
@@ -530,47 +544,47 @@
 
 <TWSNMPFC
   {info}
-  conf={twsnmpfcConf}
-  show={twsnmpfcModal}
-  on:done={handleDone}
+  bind:conf={twsnmpfcConf}
+  bind:show={twsnmpfcModal}
+  ondone={handleDone}
 />
-<TWPCAP {info} conf={twpcapConf} show={twpcapModal} on:done={handleDone} />
+<TWPCAP {info} bind:conf={twpcapConf} bind:show={twpcapModal} ondone={handleDone} />
 <TWWifiScan
   {info}
-  conf={twWifiScanConf}
-  show={twWifiScanModal}
-  on:done={handleDone}
+  bind:conf={twWifiScanConf}
+  bind:show={twWifiScanModal}
+  ondone={handleDone}
 />
 <TWWinLog
   {info}
-  conf={twWinLogConf}
-  show={twWinLogModal}
-  on:done={handleDone}
+  bind:conf={twWinLogConf}
+  bind:show={twWinLogModal}
+  ondone={handleDone}
 />
 <TWLogEye
   {info}
-  conf={twLogEyeConf}
-  show={twLogEyeModal}
-  on:done={handleDone}
+  bind:conf={twLogEyeConf}
+  bind:show={twLogEyeModal}
+  ondone={handleDone}
 />
 
-<URL url={remoteTwsnmpfcUrl} show={urlModal} on:done={handleDone} />
+<URL bind:url={remoteTwsnmpfcUrl} bind:show={urlModal} ondone={handleDone} />
 
-<Modal bind:open={waitModal} size="xs" autoclose={false} permanent>
+<Modal bind:open={waitModal} size="xs" permanent>
   {#if infoMsg != ""}
     <Alert>
-      <i class="fa-solid fa-circle-info" />
+      <i class="fa-solid fa-circle-info"></i>
       {infoMsg}
     </Alert>
   {/if}
   {#if errorMsg != ""}
     <Alert color="red">
-      <i class="fa-solid fa-triangle-exclamation" />
+      <i class="fa-solid fa-triangle-exclamation"></i>
       {errorMsg}
     </Alert>
     <Button
       color="alternative"
-      on:click={() => {
+      onmousedown={() => {
         waitModal = false;
         errorMsg = "";
       }}>閉じる</Button

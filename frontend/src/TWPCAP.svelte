@@ -1,5 +1,4 @@
 <script>
-  import { createEventDispatcher } from "svelte";
   import {
     Button,
     Modal,
@@ -11,45 +10,51 @@
     Helper,
   } from "flowbite-svelte";
 
-  export let show = false;
-  export let info = {
-    Version: "",
-    Env: "",
-    Ifaces: [],
-    PcapVersion: "",
-  };
+  let {
+    show = $bindable(false),
+    info = {
+      Version: "",
+      Env: "",
+      Ifaces: [],
+      PcapVersion: "",
+    },
+    conf = $bindable({
+      Syslog: "",
+      Interval: 600,
+      Retention: 3600,
+      Iface: "",
+      Task: false,
+    }),
+    ondone = undefined,
+  } = $props();
 
-  export let conf = {
-    Syslog: "",
-    Interval: 600,
-    Retention: 3600,
-    Iface: "",
-    Task: false,
-  };
-
-  let syslogError = false;
-  let ifaceError = false;
-
-  const dispatch = createEventDispatcher();
+  let syslogError = $state(false);
+  let ifaceError = $state(false);
 
   const cancel = () => {
     syslogError = false;
     ifaceError = false;
-    dispatch("done", {
-      type: "twpcap",
-      start: false,
-    });
+    show = false;
+    if (ondone) {
+      ondone({
+        type: "twpcap",
+        start: false,
+      });
+    }
   };
 
   const start = () => {
     if (!checkParams()) {
       return;
     }
-    dispatch("done", {
-      type: "twpcap",
-      start: true,
-      conf: conf,
-    });
+    show = false;
+    if (ondone) {
+      ondone({
+        type: "twpcap",
+        start: true,
+        conf: conf,
+      });
+    }
   };
   const checkParams = () => {
     syslogError = false;
@@ -71,7 +76,7 @@
   };
 </script>
 
-<Modal bind:open={show} size="md" autoclose={false} permanent class="w-full">
+<Modal bind:open={show} size="md" class="w-full">
   <h3 class="text-xl font-medium text-gray-900 dark:text-white">
     twpcapの起動
   </h3>
@@ -81,10 +86,10 @@
     </Alert>
   {:else}
     <Alert color="red">
-      <i class="fa-solid fa-triangle-exclamation" />
+      <i class="fa-solid fa-triangle-exclamation"></i>
       PCAPライブラリーをインストールしてください。
-      <Button class="w-2" color="alternative" on:click={help}>
-        <i class="fa-regular fa-circle-question" />
+      <Button class="w-2" color="alternative" onmousedown={help}>
+        <i class="fa-regular fa-circle-question"></i>
       </Button>
     </Alert>
   {/if}
@@ -134,7 +139,7 @@
     {/if}
   </div>
   {#if info.PcapVersion}
-    <Button on:click={start}>起動</Button>
+    <Button color="teal" class="mr-2" onmousedown={start}>起動</Button>
   {/if}
-  <Button color="alternative" on:click={cancel}>キャンセル</Button>
+  <Button color="alternative" onmousedown={cancel}>キャンセル</Button>
 </Modal>

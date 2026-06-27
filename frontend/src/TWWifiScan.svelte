@@ -1,42 +1,47 @@
 <script>
-  import { createEventDispatcher } from "svelte";
   import { Button, Modal, Label, Input, Toggle, Helper } from "flowbite-svelte";
 
-  export let show = false;
-  export let info = {
-    Version: "",
-    Env: "",
-    Ifaces: [],
-    PcapVersion: "",
-  };
+  let {
+    show = $bindable(false),
+    info = {
+      Version: "",
+      Env: "",
+      Ifaces: [],
+      PcapVersion: "",
+    },
+    conf = $bindable({
+      Syslog: "",
+      Interval: 600,
+      Task: false,
+    }),
+    ondone = undefined,
+  } = $props();
 
-  export let conf = {
-    Syslog: "",
-    Interval: 600,
-    Task: false,
-  };
-
-  let syslogError = false;
-
-  const dispatch = createEventDispatcher();
+  let syslogError = $state(false);
 
   const cancel = () => {
     syslogError = false;
-    dispatch("done", {
-      type: "twWifiScan",
-      start: false,
-    });
+    show = false;
+    if (ondone) {
+      ondone({
+        type: "twWifiScan",
+        start: false,
+      });
+    }
   };
 
   const start = () => {
     if (!checkParams()) {
       return;
     }
-    dispatch("done", {
-      type: "twWifiScan",
-      start: true,
-      conf: conf,
-    });
+    show = false;
+    if (ondone) {
+      ondone({
+        type: "twWifiScan",
+        start: true,
+        conf: conf,
+      });
+    }
   };
   const checkParams = () => {
     syslogError = false;
@@ -48,7 +53,7 @@
   };
 </script>
 
-<Modal bind:open={show} size="md" autoclose={false} permanent class="w-full">
+<Modal bind:open={show} size="md" class="w-full">
   <h3 class="text-xl text-gray-900 dark:text-white">TWWifiScanの起動</h3>
   <Label>
     <span>syslog送信先</span>
@@ -70,6 +75,6 @@
       <Toggle class="ml-3 mt-4 h-6" bind:checked={conf.Task}>スケジューラー</Toggle>
     {/if}
   </div>
-  <Button on:click={start}>起動</Button>
-  <Button color="alternative" on:click={cancel}>キャンセル</Button>
+  <Button color="teal" class="mr-2" onmousedown={start}>起動</Button>
+  <Button color="alternative" onmousedown={cancel}>キャンセル</Button>
 </Modal>

@@ -49,7 +49,7 @@ func (b *App) GetProcessInfoList() []ProcessInfo {
 }
 
 func (b *App) checkURL(url string) bool {
-	ctx, cancel := context.WithTimeout(b.ctx, 10*time.Second)
+	ctx, cancel := context.WithTimeout(b.ctx, 2*time.Second)
 	defer cancel()
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -104,6 +104,7 @@ func (b *App) Start(name string, params []string, task bool) string {
 
 func (b *App) Save(name string) {
 	b.processMap[name] = []string{}
+	b.saveConfig()
 }
 
 func (b *App) getExec(name string) string {

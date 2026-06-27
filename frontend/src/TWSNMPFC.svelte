@@ -1,5 +1,4 @@
 <script>
-  import { createEventDispatcher } from "svelte";
   import {
     Button,
     Modal,
@@ -11,44 +10,51 @@
     Helper,
   } from "flowbite-svelte";
 
-  export let show = false;
-  export let info = {
-    Version: "",
-    Env: "",
-    Ifaces: [],
-    PcapVersion: "",
-    NeedPriv: false,
-  };
-  export let conf = {
-    DataStore: "",
-    Password: "",
-    Port: 8080,
-    Local: false,
-    TLS: false,
-    Task: false,
-  };
+  let {
+    show = $bindable(false),
+    info = {
+      Version: "",
+      Env: "",
+      Ifaces: [],
+      PcapVersion: "",
+      NeedPriv: false,
+    },
+    conf = $bindable({
+      DataStore: "",
+      Password: "",
+      Port: 8080,
+      Local: false,
+      TLS: false,
+      Task: false,
+    }),
+    ondone = undefined,
+  } = $props();
 
-  let dataStoreError = false;
-
-  const dispatch = createEventDispatcher();
+  let dataStoreError = $state(false);
 
   const cancel = () => {
     dataStoreError = false;
-    dispatch("done", {
-      type: "twsnmpfc",
-      start: false,
-    });
+    show = false;
+    if (ondone) {
+      ondone({
+        type: "twsnmpfc",
+        start: false,
+      });
+    }
   };
 
   const start = () => {
     if (!checkParams()) {
       return;
     }
-    dispatch("done", {
-      type: "twsnmpfc",
-      start: true,
-      conf: conf,
-    });
+    show = false;
+    if (ondone) {
+      ondone({
+        type: "twsnmpfc",
+        start: true,
+        conf: conf,
+      });
+    }
   };
 
   const getDataStore = () => {
@@ -67,7 +73,7 @@
   };
 </script>
 
-<Modal bind:open={show} size="md" autoclose={false} permanent class="w-full">
+<Modal bind:open={show} size="md" class="w-full">
   <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">
     TWSNMP FCの起動
   </h3>
@@ -76,8 +82,8 @@
     <ButtonGroup class="w-full">
       <Input class="h-6" color={dataStoreError ? "red" : "base"} bind:value={conf.DataStore}/>
       <InputAddon>
-        <Button class="w-2 h-5" on:click={getDataStore}>
-          <i class="fa-solid fa-folder" />
+        <Button class="w-2 h-5" onmousedown={getDataStore}>
+          <i class="fa-solid fa-folder"></i>
         </Button>
       </InputAddon>
     </ButtonGroup>
@@ -102,6 +108,6 @@
       <Toggle class="ml-3 mt-5 h-6" bind:checked={conf.Task}>スケジューラー</Toggle>
     {/if}
   </div>
-  <Button on:click={start}>起動</Button>
-  <Button color="alternative" on:click={cancel}>キャンセル</Button>
+  <Button color="teal" class="mr-2" onmousedown={start}>起動</Button>
+  <Button color="alternative" onmousedown={cancel}>キャンセル</Button>
 </Modal>

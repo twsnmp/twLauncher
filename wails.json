@@ -3,7 +3,7 @@
   "name": "twLauncher",
   "outputfilename": "twLauncher",
   "frontend:build": "npm run build",
-  "frontend:install": "npm install",
+  "frontend:install": "npm install --legacy-peer-deps",
   "frontend:dev:watcher": "npm run dev",
   "frontend:dev:serverUrl": "auto",
   "author": {

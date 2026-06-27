@@ -1,5 +1,4 @@
 <script>
-  import { createEventDispatcher } from "svelte";
   import {
     Button,
     Modal,
@@ -11,45 +10,51 @@
     InputAddon,
   } from "flowbite-svelte";
   import { GetFile } from "../wailsjs/go/main/App";
-  export let show = false;
-  export let info = {
-    Version: "",
-    Env: "",
-    Ifaces: [],
-    PcapVersion: "",
-    NeedPriv: false,
-  };
+  let {
+    show = $bindable(false),
+    info = {
+      Version: "",
+      Env: "",
+      Ifaces: [],
+      PcapVersion: "",
+      NeedPriv: false,
+    },
+    conf = $bindable({
+      APIPort: 8081,
+      ConfFile: "",
+      Cert: "",
+      Key: "",
+      CACert: "",
+      Task: false,
+    }),
+    ondone = undefined,
+  } = $props();
 
-  export let conf = {
-    APIPort: 8081,
-    ConfFile: "",
-    Cert: "",
-    Key: "",
-    CACert: "",
-    Task: false,
-  };
-
-  var portError = false;
-  var confFileError = false;
-
-  const dispatch = createEventDispatcher();
+  let portError = $state(false);
+  let confFileError = $state(false);
 
   const cancel = () => {
-    dispatch("done", {
-      type: "twlogeye",
-      start: false,
-    });
+    show = false;
+    if (ondone) {
+      ondone({
+        type: "twlogeye",
+        start: false,
+      });
+    }
   };
 
   const start = () => {
     if (!checkParams()) {
       return;
     }
-    dispatch("done", {
-      type: "twlogeye",
-      start: true,
-      conf: conf,
-    });
+    show = false;
+    if (ondone) {
+      ondone({
+        type: "twlogeye",
+        start: true,
+        conf: conf,
+      });
+    }
   };
 
   const checkParams = () => {
@@ -83,7 +88,7 @@
   };
 </script>
 
-<Modal bind:open={show} size="md" autoclose={false} permanent class="w-full">
+<Modal bind:open={show} size="md" class="w-full">
   <h3 class="text-xl text-gray-900 dark:text-white">TWLogEyeの起動</h3>
   <div class="grid grid-cols-3 gap-2">
     <Label class="col-span-2">
@@ -95,8 +100,8 @@
           bind:value={conf.ConfFile}
         />
         <InputAddon>
-          <Button class="w-1 h-5" on:click={getConfFile}>
-            <i class="fa-solid fa-file" />
+          <Button class="w-1 h-5" onmousedown={getConfFile}>
+            <i class="fa-solid fa-file"></i>
           </Button>
         </InputAddon>
       </ButtonGroup>
@@ -122,8 +127,8 @@
     <ButtonGroup class="w-full">
       <Input class="h-6" bind:value={conf.Key} />
       <InputAddon>
-        <Button class="w-1 h-5" on:click={getKeyFile}>
-          <i class="fa-solid fa-key" />
+        <Button class="w-1 h-5" onmousedown={getKeyFile}>
+          <i class="fa-solid fa-key"></i>
         </Button>
       </InputAddon>
     </ButtonGroup>
@@ -134,8 +139,8 @@
     <ButtonGroup class="w-full">
       <Input class="h-6" bind:value={conf.Cert} />
       <InputAddon>
-        <Button class="w-2 h-5" on:click={getCertFile}>
-          <i class="fa-solid fa-certificate" />
+        <Button class="w-2 h-5" onmousedown={getCertFile}>
+          <i class="fa-solid fa-certificate"></i>
         </Button>
       </InputAddon>
     </ButtonGroup>
@@ -146,8 +151,8 @@
     <ButtonGroup class="w-full">
       <Input class="h-6" bind:value={conf.CACert} />
       <InputAddon>
-        <Button class="w-2 h-5" on:click={getCACertFile}>
-          <i class="fa-solid fa-certificate" />
+        <Button class="w-2 h-5" onmousedown={getCACertFile}>
+          <i class="fa-solid fa-certificate"></i>
         </Button>
       </InputAddon>
     </ButtonGroup>
@@ -158,6 +163,6 @@
   {#if info.Env == "windows" && !info.NeedPriv}
     <Toggle class="mt-2 h-6" bind:checked={conf.Task}>スケジューラー</Toggle>
   {/if}
-  <Button on:click={start}>起動</Button>
-  <Button color="alternative" on:click={cancel}>キャンセル</Button>
+  <Button color="teal" class="mr-2" onmousedown={start}>起動</Button>
+  <Button color="alternative" onmousedown={cancel}>キャンセル</Button>
 </Modal>
