@@ -570,7 +570,7 @@
 
 <URL bind:url={remoteTwsnmpfcUrl} bind:show={urlModal} ondone={handleDone} />
 
-<Modal bind:open={waitModal} size="xs" permanent>
+<Modal bind:open={waitModal} size="lg" permanent>
   {#if infoMsg != ""}
     <Alert>
       <i class="fa-solid fa-circle-info"></i>
