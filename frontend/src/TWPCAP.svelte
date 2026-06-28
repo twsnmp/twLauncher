@@ -96,7 +96,7 @@
   <Label>
     <span>syslog送信先</span>
     <Input
-      color={syslogError ? "red" : "base"}
+      color={syslogError ? "red" : "default"}
       bind:value={conf.Syslog}
       class="h-6 mt-1"
     />
@@ -108,7 +108,7 @@
     >LANポート
     <Select
       class="h-6 mt-1"
-      color={ifaceError ? "red" : "base"}
+      color={ifaceError ? "red" : "default"}
       bind:value={conf.Iface}
       placeholder=""
     >

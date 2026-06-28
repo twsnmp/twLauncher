@@ -80,7 +80,7 @@
   <Label>
     <span>データストア</span>
     <ButtonGroup class="w-full">
-      <Input class="h-6" color={dataStoreError ? "red" : "base"} bind:value={conf.DataStore}/>
+      <Input class="h-6" color={dataStoreError ? "red" : "default"} bind:value={conf.DataStore}/>
       <InputAddon>
         <Button class="w-2 h-5" onmousedown={getDataStore}>
           <i class="fa-solid fa-folder"></i>

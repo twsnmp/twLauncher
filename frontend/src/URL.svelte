@@ -44,7 +44,7 @@
   <Label>
     <span>URL</span>
     <Input
-      color={urlError ? "red" : "base"}
+      color={urlError ? "red" : "default"}
       bind:value={url}
       class="mt-1 h-6"
     />

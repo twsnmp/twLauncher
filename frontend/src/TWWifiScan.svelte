@@ -58,7 +58,7 @@
   <Label>
     <span>syslog送信先</span>
     <Input
-      color={syslogError ? "red" : "base"}
+      color={syslogError ? "red" : "default"}
       bind:value={conf.Syslog}
       class="mt-1 h-6"
     />

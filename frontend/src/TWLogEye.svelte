@@ -96,7 +96,7 @@
       <ButtonGroup class="w-full">
         <Input
           class="h-6"
-          color={confFileError ? "red" : "base"}
+          color={confFileError ? "red" : "default"}
           bind:value={conf.ConfFile}
         />
         <InputAddon>
@@ -112,7 +112,7 @@
     <Label>
       <span>APIポート番号</span>
       <Input
-        color={portError ? "red" : "base"}
+        color={portError ? "red" : "default"}
         type="number"
         class="ml-2 w-2 h-6"
         bind:value={conf.APIPort}
