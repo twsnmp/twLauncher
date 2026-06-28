@@ -46,9 +46,9 @@
     <Input
       color={urlError ? "red" : "default"}
       bind:value={url}
-      class="mt-1 h-6"
+      class="mt-2"
     />
-    <Helper class="mt-1" color={urlError ? "red" : "gray"}>
+    <Helper class="mt-2" color={urlError ? "red" : "gray"}>
       リモートのTWSNMP FCに接続するためのURLを指定してください。
     </Helper>
   </Label>

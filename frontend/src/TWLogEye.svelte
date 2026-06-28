@@ -95,12 +95,11 @@
       <span>設定ファイル</span>
       <ButtonGroup class="w-full">
         <Input
-          class="h-6"
           color={confFileError ? "red" : "default"}
           bind:value={conf.ConfFile}
         />
         <InputAddon>
-          <Button class="w-1 h-5" onmousedown={getConfFile}>
+          <Button class="w-1" onmousedown={getConfFile}>
             <i class="fa-solid fa-file"></i>
           </Button>
         </InputAddon>
@@ -114,7 +113,7 @@
       <Input
         color={portError ? "red" : "default"}
         type="number"
-        class="ml-2 w-2 h-6"
+        class="ml-2 w-2"
         bind:value={conf.APIPort}
       />
       <Helper class="mt-1" color={portError ? "red" : "gray"}>
@@ -125,9 +124,9 @@
   <Label>
     <span>APIサーバー秘密鍵ファイル</span>
     <ButtonGroup class="w-full">
-      <Input class="h-6" bind:value={conf.Key} />
+      <Input bind:value={conf.Key} />
       <InputAddon>
-        <Button class="w-1 h-5" onmousedown={getKeyFile}>
+        <Button class="w-1" onmousedown={getKeyFile}>
           <i class="fa-solid fa-key"></i>
         </Button>
       </InputAddon>
@@ -137,9 +136,9 @@
   <Label>
     <span>APIサーバー証明書ファイル</span>
     <ButtonGroup class="w-full">
-      <Input class="h-6" bind:value={conf.Cert} />
+      <Input bind:value={conf.Cert} />
       <InputAddon>
-        <Button class="w-2 h-5" onmousedown={getCertFile}>
+        <Button class="w-2" onmousedown={getCertFile}>
           <i class="fa-solid fa-certificate"></i>
         </Button>
       </InputAddon>
@@ -149,9 +148,9 @@
   <Label>
     <span>APIサーバーCA証明書ファイル</span>
     <ButtonGroup class="w-full">
-      <Input class="h-6" bind:value={conf.CACert} />
+      <Input bind:value={conf.CACert} />
       <InputAddon>
-        <Button class="w-2 h-5" onmousedown={getCACertFile}>
+        <Button class="w-1" onmousedown={getCACertFile}>
           <i class="fa-solid fa-certificate"></i>
         </Button>
       </InputAddon>
@@ -161,7 +160,7 @@
     </Helper>
   </Label>
   {#if info.Env == "windows" && !info.NeedPriv}
-    <Toggle class="mt-2 h-6" bind:checked={conf.Task}>スケジューラー</Toggle>
+    <Toggle class="ml-3" bind:checked={conf.Task}>スケジューラー</Toggle>
   {/if}
   <Button color="teal" class="mr-2" onmousedown={start}>起動</Button>
   <Button color="alternative" onmousedown={cancel}>キャンセル</Button>

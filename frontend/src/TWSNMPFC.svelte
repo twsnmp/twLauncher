@@ -80,9 +80,9 @@
   <Label>
     <span>データストア</span>
     <ButtonGroup class="w-full">
-      <Input class="h-6" color={dataStoreError ? "red" : "default"} bind:value={conf.DataStore}/>
+      <Input color={dataStoreError ? "red" : "default"} bind:value={conf.DataStore}/>
       <InputAddon>
-        <Button class="w-2 h-5" onmousedown={getDataStore}>
+        <Button class="w-2" onmousedown={getDataStore}>
           <i class="fa-solid fa-folder"></i>
         </Button>
       </InputAddon>
@@ -93,19 +93,19 @@
   </Label>
   <Label>
     <span>パスワード</span>
-    <Input class="h-6" type="password" bind:value={conf.Password} />
+    <Input type="password" bind:value={conf.Password} />
   </Label>
   <div class="flex">
     <Label>
       <span>ポート番号</span>
-      <Input type="number" class="w-3 h-6" required bind:value={conf.Port} />
+      <Input type="number" class="w-3" required bind:value={conf.Port} />
     </Label>
-    <Toggle class="ml-3 mt-5 h-6" bind:checked={conf.Local}>ローカル</Toggle>
+    <Toggle class="ml-3" bind:checked={conf.Local}>ローカル</Toggle>
     {#if !conf.Local}
-      <Toggle class="ml-3 mt-5 h-6" bind:checked={conf.TLS}>TLS(HTTPS)</Toggle>
+      <Toggle class="ml-3" bind:checked={conf.TLS}>TLS(HTTPS)</Toggle>
     {/if}
     {#if info.Env == "windows" && !info.NeedPriv}
-      <Toggle class="ml-3 mt-5 h-6" bind:checked={conf.Task}>スケジューラー</Toggle>
+      <Toggle class="ml-3" bind:checked={conf.Task}>スケジューラー</Toggle>
     {/if}
   </div>
   <Button color="teal" class="mr-2" onmousedown={start}>起動</Button>
