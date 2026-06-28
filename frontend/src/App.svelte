@@ -539,7 +539,7 @@
 </SpeedDial>
 
 <Footer class="absolute bottom-0 left-0 z-20 w-full">
-  <FooterCopyright by="Masayuki Yamai™" year={2021} />
+  <FooterCopyright by="Masayuki Yamai™" year={2026} />
 </Footer>
 
 <TWSNMPFC
