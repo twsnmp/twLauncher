@@ -12,4 +12,5 @@
 	<key>LSApplicationCategoryType</key><string>public.app-category.developer-tools</string>
 	<key>NSHighResolutionCapable</key><string>true</string>
 	<key>NSHumanReadableCopyright</key><string>Copyright 2021 Masayuki Yamai</string>
+	<key>NSLocalNetworkUsageDescription</key><string>TWSNMP FCがローカルネットワーク上のノードの監視、ポーリング、検知を行うためにローカルネットワークへのアクセスが必要です。</string>
 </dict></plist>

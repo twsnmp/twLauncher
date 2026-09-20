@@ -28,5 +28,7 @@
             <key>NSAllowsLocalNetworking</key>
             <true/>
         </dict>
+        <key>NSLocalNetworkUsageDescription</key>
+        <string>TWSNMP FCがローカルネットワーク上のノードの監視、ポーリング、検知を行うためにローカルネットワークへのアクセスが必要です。</string>
     </dict>
 </plist>
